@@ -1,0 +1,6 @@
+# Files
+*.py[cd]
+.coverage
+
+# Virtualenvs
+env*
