@@ -1,0 +1,35 @@
+            NOME DA EMPRESA
+         ENDEREÇO - CEP:00000-005
+         FONE:(00)0000.0000 - CIDADE - BR
+CNPJ:  00.000.00/0000-00
+IE  :          0000000000
+--------------------------------------------------------
+                      FITA-DETALHE
+Emissão: 11/03/2013   18:35:08   COOi=000001 COOf=999999
+08/01/2013 15:34:00  CCF:019762               COO:024201
+                      CUPOM FISCAL
+ITEM CÓDIGO          DESCRIÇÃO
+QTD.   UN.     VL UNIT R$              ST     VL ITEM R$
+--------------------------------------------------------
+  1 1611 DOSE UNDERBERG 1DO X          5,00 F1     5,00#
+    cancelamento de item: 1                       -5,00
+  2 872 #POLENTA FINA 1UN X           11,00 Te    11,00#
+    cancelamento de item: 2                      -11,00
+  3 117 #SALADA (POR PESSOA) 2UN X    12,00 Te    24,00#
+    cancelamento de item: 3                      -24,00
+  4 117 #SALADA (POR PESSOA) 7UN X    12,00 Te    84,00#
+    cancelamento de item: 4                      -84,00
+  5 1281 AGUA FONTE IJUI C/G 1UN X     3,20 F1     3,20#
+    cancelamento de item: 5                       -3,20
+                                          --------------
+TOTAL R$                                           0,00
+Te=07,20%
+
+                 CUPOM FISCAL CANCELADO
+
+--------------------------------------------------------
+ECC555    333AAA    BBB25D    CCCCA2    333CCC    444AAA
+EPSON                                        TM-T81 FBII
+ECF-IF VERSÃO:01.10.00 ECF:005                   LJ:0001
+&&&&&&&&&<!*@%%&!>                   31/01/2013 01:58:44
+FAB:EP000000000000000001                              BR

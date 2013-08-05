@@ -1,0 +1,39 @@
+            NOME DA EMPRESA
+         ENDEREÇO - CEP:00000-005
+         FONE:(00)0000.0000 - CIDADE - BR
+CNPJ:  00.000.00/0000-00
+IE  :          0000000000
+--------------------------------------------------------
+                      FITA-DETALHE
+Emissão: 11/03/2013   18:35:08   COOi=000001 COOf=999999
+31/01/2013 01:58:36  CCF:019827               COO:024422
+                      CUPOM FISCAL
+ITEM CÓDIGO          DESCRIÇÃO
+QTD.   UN.     VL UNIT R$              ST     VL ITEM R$
+--------------------------------------------------------
+  1 872 #POLENTA FINA 2UN X           11,00 Te    22,00#
+  2 1352 SUCO DE UVA 1UN X             5,50 F1     5,50#
+  3 1280 AGUA FONTE IJUI S/G 1UN X     3,20 F1     3,20#
+  4 119 #LINGUICA CASEIRA 2UN X       12,00 Te    24,00#
+  5 464 #CARRETEIRO DE FILET 1UN X    45,00 Te    45,00#
+  6 117 #SALADA (POR PESSOA) 6UN X    12,00 Te    72,00#
+  7 1202 COCA COLA ZERO LT. 1UN X      3,50 F1     3,50#
+  8 324 #PICANHA ANGUS 2UN X          47,00 Te    94,00#
+  9 990 #CAFE EXPRESSO 1UN X           3,00 Tc     3,00#
+ 10 1400 CHOPP CL. BRAHMA 300 25UN X   6,00 F1   150,00#
+                                          --------------
+TOTAL R$                                         422,20
+REDECARD CRED.                                   422,20
+Te=07,20% Tc=17,00%
+MD-5:c0002aee066cdf8711654db02f605200
+Consumo da Mesa:056-SEM EMISSAO DE CONF.DE MESA
+Mesa : 056 Sequencia : 303
+      OBRIGADO POR SUA PREFERENCIA
+            SERVICO OPCIONAL
+             VOLTE SEMPRE!
+--------------------------------------------------------
+ECC555    333AAA    BBB25D    CCCCA2    333CCC    444AAA
+EPSON                                        TM-T81 FBII
+ECF-IF VERSÃO:01.10.00 ECF:005                   LJ:0001
+&&&&&&&&&<!*@%%&!>                   31/01/2013 01:58:44
+FAB:EP000000000000000001                              BR

@@ -1,0 +1,98 @@
+            NOME DA EMPRESA
+         ENDEREÇO - CEP:00000-005
+         FONE:(00)0000.0000 - CIDADE - BR
+CNPJ:  00.000.00/0000-00
+IE  :          0000000000
+--------------------------------------------------------
+                      FITA-DETALHE
+Emissão: 11/03/2013   18:35:08   COOi=000001 COOf=999999
+08/01/2013 09:59:37                           COO:024152
+                       REDUÇÃO Z
+MOVIMENTO DO DIA: 07/01/2013
+                       CONTADORES
+Geral de Operação Não-Fiscal:                     001367
+Contador de Reinicio de Operação:                    003
+Contador de Redução Z:                              1389
+Contador de Cupom Fiscal:                         019761
+Contador de Fita-Detalhe:                         000000
+Comprovante de Crédito ou Débito:                   0000
+Geral de Relatório Gerencial:                     001367
+Geral Oper. Não-Fiscal Canc.:                       0000
+Cupom Fiscal Cancelado:                             0000
+                     TOTALIZADORES
+TOTALIZADOR GERAL:                            2509579,93
+VENDA BRUTA DIÁRIA:                              6476,50
+CANCELAMENTO ICMS:                                  0,00
+DESCONTO ICMS:                                      0,00
+Total de ISSQN:                                     0,00
+                                          --------------
+VENDA LÍQUIDA:                                   6476,50
+ACRÉSCIMO ICMS:                                     0,00
+ACRÉSCIMO ISSQN:                                    0,00
+                          ICMS
+Totalizador        Base Cálculo(R$)          Imposto(R$)
+T07,00%                        0,00                 0,00
+T12,00%                        0,00                 0,00
+T17,00%                       93,00                15,81
+T25,00%                        0,00                 0,00
+T07,20%                     5342,50               384,66
+                  --------------------------------------
+Total ICMS:                 5435,50               400,47
+Não Tributados                       Valor Acumulado(R$)
+F1 =                                             1041,00
+I1 =                                                0,00
+N1 =                                                0,00
+               TOTALIZADORES NÃO FISCAIS
+Nº   Operação                   CON  Valor Acumulado(R$)
+ 1   Sangria                   0010               100,00
+ 2   Fundo de Troco            0020               200,00
+ 3   Assinada                  0030               300,00
+                                          --------------
+Total Oper Não-Fiscais                              0,00
+ACRE NÃO-FISC                                       0,00
+DESC NÃO-FISC                                       0,00
+CANC NÃO-FISC                                       0,00
+                  RELATÓRIO GERENCIAL
+Nº   Relatório                                       CER
+ 1   Configuração                                   0000
+ 2   Conf. de mesa                                  0146
+ 3   Conf. de ficha                                 0000
+ 4   Mesas em aberto                                0000
+ 5   Fichas abertas                                 0000
+ 6   Transf. mesas                                  0000
+ 7   Reg. venda/canc                                0000
+ 8   Fech. operador                                 0000
+ 9   Fech. periodo                                  0000
+10   Recibo pgto.                                   0000
+11   TEF                                            0000
+12   Ident. PAF-ECF                                 0000
+13   Conta assinada                                 0000
+14   Meios de Pagto                                 0000
+15   Param. PAF                                     0000
+                   MEIOS DE PAGAMENTO
+Nº   Meio de Pagamento               Valor Acumulado(R$)
+ 1   Dinheiro                                       0,00
+ 2   CHEQUE                                         0,00
+ 3   CONTRA-VALE                                    0,00
+ 4   REDECARD CRED.                              6476,50
+ 5   REDECARD DEB.                                  0,00
+ 6   HIPERCARD                                      0,00
+ 7   VISA VALE                                      0,00
+ 8   GOOD CARD                                      0,00
+ 9   BARICOMPRAS A V (V)                            0,00
+10   BANRICOMPRAS 30                                0,00
+11   SINAL                                          0,00
+12   CONTA ASSINADA                                 0,00
+13   CONTRA VALE                                    0,00
+TROCO                                               0,00
+Comprovante Não Emitido:                            0057
+Tempo Emitindo Doc. Fiscal:                     00:06:32
+Tempo Operacional:                              24:20:57
+Qtd. Reduções Restantes:                            1611
+Número série MFD:                    MFD0000000000000000
+--------------------------------------------------------
+ECC555    333AAA    BBB25D    CCCCA2    333CCC    444AAA
+EPSON                                        TM-T81 FBII
+ECF-IF VERSÃO:01.10.00 ECF:005                   LJ:0001
+&&&&&&&&&<!*@%%&!>                   31/01/2013 01:58:44
+FAB:EP000000000000000001                              BR
