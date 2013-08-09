@@ -11,6 +11,7 @@ retorna o(s) dado(s).
 
 import re
 from datetime import date, datetime
+import collections
 
 
 class CampoBase(object):
@@ -101,8 +102,8 @@ class CampoBase(object):
         self.ao_atribuir = kwargs.get('ao_atribuir')
         self.grupos = kwargs.get('grupos', [])
 
-        if self.ao_atribuir and not callable(self.ao_atribuir):
-            raise TypeError(u'O callback ao_atribuir não é uma função.')
+        if self.ao_atribuir and not isinstance(self.ao_atribuir, collections.Callable):
+            raise TypeError('O callback ao_atribuir não é uma função.')
 
         if not (isinstance(self.grupos, list) or isinstance(self.grupos, tuple)):
             self.grupos = [self.grupos, ]

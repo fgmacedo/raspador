@@ -2,8 +2,9 @@
 import re
 import weakref
 
-from cache import Cache
-from colecoes import Dicionario
+from .cache import Cache
+from .colecoes import Dicionario
+import collections
 
 
 class AuxiliarDeAnalizador(object):
@@ -27,7 +28,7 @@ class AuxiliarDeAnalizador(object):
             impedindo a liberação de memória do analizador.
         """
         ref = weakref.ref(self)
-        for item in self._campos.values():
+        for item in list(self._campos.values()):
             if hasattr(item, 'atribuir_analizador'):
                 item.atribuir_analizador(ref)
 
@@ -42,12 +43,15 @@ class AuxiliarDeAnalizador(object):
     def converter_linha(self, linha, codificacao):
         if codificacao == 'utf-8':
             return linha
-        return linha.decode(codificacao).encode('utf-8')
+        try:
+            return linha.decode(codificacao).encode('utf-8')
+        except:
+            return linha
 
     def analizar_arquivo(self, arquivo, codificacao='latin1'):
         try:
             while True:
-                linha = arquivo.next()
+                linha = next(arquivo)
                 linha = self.converter_linha(linha, codificacao)
                 res = self.analizar_linha(linha)
                 if res:
@@ -72,7 +76,7 @@ class AuxiliarDeAnalizador(object):
                 self.inicio_encontrado = not bool(self._fim.match(linha))
 
             for linha in self.cache.consumir():
-                for nome, campo in self._campos.items():
+                for nome, campo in list(self._campos.items()):
                     if nome in self.retorno and hasattr(campo, 'lista') and not campo.lista:
                         continue
                     valor = campo.analizar_linha(linha)
@@ -92,10 +96,10 @@ class AuxiliarDeAnalizador(object):
         return self.finalizar_retorno()
 
     def finalizar_retorno(self):
-        for nome, campo in self._campos.items():
+        for nome, campo in list(self._campos.items()):
             if not nome in self.retorno:
                 valor = None
-                if hasattr(campo, 'finalizar') and callable(campo.finalizar):
+                if hasattr(campo, 'finalizar') and isinstance(campo.finalizar, collections.Callable):
                     valor = campo.finalizar()
                 if valor is None:
                     valor = campo.valor_padrao
@@ -134,7 +138,7 @@ class MetaclasseDeAnalizador(type):
     def __init__(cls, nome_classe, ancestrais, atributos):
         super(MetaclasseDeAnalizador, cls).__init__(nome_classe, ancestrais, atributos)
 
-        cls._campos = {k: v for k, v in atributos.items() if
+        cls._campos = {k: v for k, v in list(atributos.items()) if
             hasattr(v, 'analizar_linha') and not isinstance(v, type)}
 
         cls.adicionar_atributo_re(cls, atributos, 'inicio')
@@ -146,7 +150,7 @@ class MetaclasseDeAnalizador(type):
         if not hasattr(cls, 'retornar_ao_obter_valor'):
             cls.retornar_ao_obter_valor = False
 
-        for nome, atributo in cls._campos.items():
+        for nome, atributo in list(cls._campos.items()):
             if hasattr(atributo, 'anexar_na_classe'):
                 atributo.anexar_na_classe(cls, nome, cls._campos)
 
@@ -160,9 +164,4 @@ class MetaclasseDeAnalizador(type):
         return Dicionario()
 
 
-class Analizador(object):
-    """
-    Classe base que define a meta-classe para introspecção dos atributos
-    que contém a definição de analizadores de arquivos.
-    """
-    __metaclass__ = MetaclasseDeAnalizador
+Analizador = MetaclasseDeAnalizador('Analizador', (object,), {})

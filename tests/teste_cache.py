@@ -1,6 +1,5 @@
 #coding: utf-8
 import unittest
-import iniciar_testes
 from raspador.cache import Cache
 
 

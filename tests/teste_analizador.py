@@ -1,10 +1,11 @@
 #coding: utf-8
 import unittest
 import re
-from teste_uteis import OBTER_CAMINHO, assertDicionario
+from .teste_uteis import OBTER_CAMINHO, assertDicionario
 from raspador.analizador import Analizador, Dicionario
 from raspador.campos import CampoBase, CampoNumerico, \
     CampoInteiro, CampoBooleano
+import collections
 
 
 class BaseParaTestesComApiDeArquivo(unittest.TestCase):
@@ -18,7 +19,7 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
 
         # verificando se analizador foi criado
         self.assertTrue(hasattr(self.analizador, 'analizar'))
-        self.assertTrue(callable(self.analizador.analizar))
+        self.assertTrue(isinstance(self.analizador.analizar, collections.Callable))
 
         if self.cache_itens:
             self.itens = self.cache_itens
@@ -142,15 +143,8 @@ class TesteExtrairDadosDeCupons(BaseParaTestesComApiDeArquivo):
     def teste_se_item_esta_correto(self):
         itens = [
             {
-                "COO": 22730,
-                "Total": 793.0,
-                "Cancelado": False
-            }, {
-                "COO": 22731,
-                "Cancelado": True
-            }, {
-                "COO": 22738,
-                "Total": 22.0,
+                "COO": 24422,
+                "Total": 422.2,
                 "Cancelado": False
             },
         ]
