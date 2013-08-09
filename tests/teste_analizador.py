@@ -1,11 +1,12 @@
 #coding: utf-8
 import unittest
 import re
+import collections
+import codecs
 from .teste_uteis import OBTER_CAMINHO, assertDicionario
 from raspador.analizador import Analizador, Dicionario
 from raspador.campos import CampoBase, CampoNumerico, \
     CampoInteiro, CampoBooleano
-import collections
 
 
 class BaseParaTestesComApiDeArquivo(unittest.TestCase):
@@ -173,7 +174,7 @@ class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
                     )
 
             inicio = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
-            fim = r'^\s+-+$'
+            fim = r'^[\s-]*$'
             Totalizador = CampoNF(lista=True)
 
             def processar_retorno(self):
@@ -183,7 +184,7 @@ class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
             inicio = r'^\s+REDUÇÃO Z\s+$'
             fim = r'^FAB:.*BR$'
             qtd_linhas_cache = 1
-            COO = CampoInteiro(r'COO:\s*(\d+)$')
+            COO = CampoInteiro(r'COO:\s*(\d+)')
             CRZ = CampoInteiro(r'Contador de Redução Z:\s*(\d+)')
             Totalizadores = TotalizadoresNaoFiscais()
 
@@ -214,4 +215,4 @@ class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
                 ]
             }
         ]
-        self.assertEqual(self.itens, reducao)
+        self.assertDicionario(reducao[0], self.itens[0])

@@ -1,6 +1,7 @@
 # Files
 *.py[cd]
 .coverage
+MANIFEST
 
 # Virtualenvs
 env*

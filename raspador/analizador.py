@@ -5,7 +5,9 @@ import weakref
 from .cache import Cache
 from .colecoes import Dicionario
 import collections
+import logging
 
+logger = logging.getLogger(__name__)
 
 class AuxiliarDeAnalizador(object):
     """
@@ -41,6 +43,7 @@ class AuxiliarDeAnalizador(object):
         return hasattr(self, 'retorno') and self.retorno is not None
 
     def converter_linha(self, linha, codificacao):
+        logger.debug('converter_linha (%s): %s', codificacao, linha)
         if codificacao == 'utf-8':
             return linha
         try:
