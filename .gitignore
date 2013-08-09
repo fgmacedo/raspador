@@ -4,3 +4,8 @@
 
 # Virtualenvs
 env*
+
+# Distribute
+build
+dist
+raspador.egg-info
