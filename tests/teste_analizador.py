@@ -1,8 +1,6 @@
 #coding: utf-8
 import unittest
 import re
-import collections
-import codecs
 from .teste_uteis import full_path, assertDicionario
 from raspador.analizador import Analizador, Dicionario
 from raspador.campos import CampoBase, CampoNumerico, \
@@ -11,7 +9,8 @@ from raspador.campos import CampoBase, CampoNumerico, \
 
 class CampoItem(CampoBase):
     def _iniciar(self):
-        self.mascara = r'(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)'
+        self.mascara = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
+                        "\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)")
 
     def _para_python(self, r):
         return Dicionario(
@@ -77,7 +76,6 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
 
         # verificando se analizador foi criado
         self.assertTrue(hasattr(self.analizador, 'analizar'))
-        self.assertTrue(isinstance(self.analizador.analizar, collections.Callable))
 
         if self.cache_itens:
             self.itens = self.cache_itens
@@ -85,7 +83,9 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
             return
 
         self.itens = self.analizar()
-        self.itens_dict = {item.get('Cupom', item.get('ReducaoZ')).COO: item.get('Cupom', item.get('ReducaoZ')) for item in self.itens if item.get('Cupom', item.get('ReducaoZ'))}
+        cupom_or_reduz = lambda x: x.get('Cupom', x.get('ReducaoZ'))
+        self.itens_dict = {cupom_or_reduz(item).COO: cupom_or_reduz(item) for
+                           item in self.itens if cupom_or_reduz(item)}
         if self.fazer_cache_itens:
             self.__class__.cache_itens = self.itens
             self.__class__.cache_itens_dict = self.itens_dict
@@ -98,10 +98,12 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
 
     def obter_arquivo(self):
         "sobrescrever retornando arquivo"
-        raise NotImplementedError('Retorne o objeto file-like que será analizado')
+        raise NotImplementedError('Return an file-like object')
 
     def analizar(self):
-        return list(self.analizador.analizar(self.arquivo, codificacao=self.codificacao_arquivo) or [])
+        return list(self.analizador.analizar(
+            self.arquivo,
+            codificacao=self.codificacao_arquivo) or [])
 
     assertDicionario = assertDicionario
 
@@ -124,16 +126,106 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
             "Cancelado": False,
             "Total": 422.2,
             "Itens": [
-                {"Item": 1, "Codigo": "872", "Descricao": "#POLENTA FINA", "Qtd": 2, "Unidade": "UN", "ValorUnitario": 11.00, "Aliquota": "Te", "ValorTotal": 22.00},
-                {"Item": 2, "Codigo": "1352", "Descricao": "SUCO DE UVA", "Qtd": 1, "Unidade": "UN", "ValorUnitario": 5.50, "Aliquota": "F1", "ValorTotal": 5.50},
-                {"Item": 3, "Codigo": "1280", "Descricao": "AGUA FONTE IJUI S/G", "Qtd": 1, "Unidade": "UN", "ValorUnitario": 3.20, "Aliquota": "F1", "ValorTotal": 3.20},
-                {"Item": 4, "Codigo": "119", "Descricao": "#LINGUICA CASEIRA", "Qtd": 2, "Unidade": "UN", "ValorUnitario": 12.00, "Aliquota": "Te", "ValorTotal": 24.00},
-                {"Item": 5, "Codigo": "464", "Descricao": "#CARRETEIRO DE FILET", "Qtd": 1, "Unidade": "UN", "ValorUnitario": 45.00, "Aliquota": "Te", "ValorTotal": 45.00},
-                {"Item": 6, "Codigo": "117", "Descricao": "#SALADA (POR PESSOA)", "Qtd": 6, "Unidade": "UN", "ValorUnitario": 12.00, "Aliquota": "Te", "ValorTotal": 72.00},
-                {"Item": 7, "Codigo": "1202", "Descricao": "COCA COLA ZERO LT.", "Qtd": 1, "Unidade": "UN", "ValorUnitario": 3.50, "Aliquota": "F1", "ValorTotal": 3.50},
-                {"Item": 8, "Codigo": "324", "Descricao": "#PICANHA ANGUS", "Qtd": 2, "Unidade": "UN", "ValorUnitario": 47.00, "Aliquota": "Te", "ValorTotal": 94.00},
-                {"Item": 9, "Codigo": "990", "Descricao": "#CAFE EXPRESSO", "Qtd": 1, "Unidade": "UN", "ValorUnitario": 3.00, "Aliquota": "Tc", "ValorTotal": 3.00},
-                {"Item": 10, "Codigo": "1400", "Descricao": "CHOPP CL. BRAHMA 300", "Qtd": 25, "Unidade": "UN", "ValorUnitario": 6.00, "Aliquota": "F1", "ValorTotal": 150.00},
+                {
+                    "Item": 1,
+                    "Codigo": "872",
+                    "Descricao": "#POLENTA FINA",
+                    "Qtd": 2,
+                    "Unidade": "UN",
+                    "ValorUnitario": 11.00,
+                    "Aliquota": "Te",
+                    "ValorTotal": 22.00
+                },
+                {
+                    "Item": 2,
+                    "Codigo": "1352",
+                    "Descricao": "SUCO DE UVA",
+                    "Qtd": 1,
+                    "Unidade": "UN",
+                    "ValorUnitario": 5.50,
+                    "Aliquota": "F1",
+                    "ValorTotal": 5.50
+                },
+                {
+                    "Item": 3,
+                    "Codigo": "1280",
+                    "Descricao": "AGUA FONTE IJUI S/G",
+                    "Qtd": 1,
+                    "Unidade": "UN",
+                    "ValorUnitario": 3.20,
+                    "Aliquota": "F1",
+                    "ValorTotal": 3.20
+                },
+                {
+                    "Item": 4,
+                    "Codigo": "119",
+                    "Descricao": "#LINGUICA CASEIRA",
+                    "Qtd": 2,
+                    "Unidade": "UN",
+                    "ValorUnitario": 12.00,
+                    "Aliquota": "Te",
+                    "ValorTotal": 24.00
+                },
+                {
+                    "Item": 5,
+                    "Codigo": "464",
+                    "Descricao": "#CARRETEIRO DE FILET",
+                    "Qtd": 1,
+                    "Unidade": "UN",
+                    "ValorUnitario": 45.00,
+                    "Aliquota": "Te",
+                    "ValorTotal": 45.00
+                },
+                {
+                    "Item": 6,
+                    "Codigo": "117",
+                    "Descricao": "#SALADA (POR PESSOA)",
+                    "Qtd": 6,
+                    "Unidade": "UN",
+                    "ValorUnitario": 12.00,
+                    "Aliquota": "Te",
+                    "ValorTotal": 72.00
+                },
+                {
+                    "Item": 7,
+                    "Codigo": "1202",
+                    "Descricao": "COCA COLA ZERO LT.",
+                    "Qtd": 1,
+                    "Unidade": "UN",
+                    "ValorUnitario": 3.50,
+                    "Aliquota": "F1",
+                    "ValorTotal": 3.50
+                },
+                {
+                    "Item": 8,
+                    "Codigo": "324",
+                    "Descricao": "#PICANHA ANGUS",
+                    "Qtd": 2,
+                    "Unidade": "UN",
+                    "ValorUnitario": 47.00,
+                    "Aliquota": "Te",
+                    "ValorTotal": 94.00
+                },
+                {
+                    "Item": 9,
+                    "Codigo": "990",
+                    "Descricao": "#CAFE EXPRESSO",
+                    "Qtd": 1,
+                    "Unidade": "UN",
+                    "ValorUnitario": 3.00,
+                    "Aliquota": "Tc",
+                    "ValorTotal": 3.00
+                },
+                {
+                    "Item": 10,
+                    "Codigo": "1400",
+                    "Descricao": "CHOPP CL. BRAHMA 300",
+                    "Qtd": 25,
+                    "Unidade": "UN",
+                    "ValorUnitario": 6.00,
+                    "Aliquota": "F1",
+                    "ValorTotal": 150.00
+                },
             ]
         }
         self.assertEqual(self.itens[0], item)

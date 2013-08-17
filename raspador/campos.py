@@ -3,36 +3,36 @@
 """
 Os campos são simples extratores de dados baseados em expressões regulares.
 
-Ao confrontar uma linha recebida para análise com sua expressão regular,
-o campo verifica se há grupos de dados capturados, e então pode realizar algum
-processamento e validações nestes dados. Se o campo considerar os dados válidos,
-retorna o(s) dado(s).
-"""
+Ao confrontar uma linha recebida para análise com sua expressão regular, o
+campo verifica se há grupos de dados capturados, e então pode realizar algum
+processamento e validações nestes dados. Se o campo considerar os dados
+válidos, retorna o(s) dado(s). """
 
 import re
-from datetime import date, datetime
+from datetime import datetime
 import collections
 
 
 class CampoBase(object):
     """
-    Contém lógica de processamento para extrair dados através de expressões regulares,
-    além de prover métodos utilitários que podem ser sobrescritos para customizações
-    no tratamento dos dados.
+    Contém lógica de processamento para extrair dados através de expressões
+    regulares, além de prover métodos utilitários que podem ser sobrescritos
+    para customizações no tratamento dos dados.
 
     O comportamento do Campo pode ser ajustado através de diversos parâmetros:
 
     mascara
 
-        O requisito mínimo para um campo é uma máscara em expressão regular, onde
-        deve-se especificar um grupo para captura::
+        O requisito mínimo para um campo é uma máscara em expressão regular,
+        onde deve-se especificar um grupo para captura::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> campo = CampoBase(mascara=r'COO:(\d+)')
             >>> campo.analizar_linha(s)
             '022734'
 
-        O parâmetro mascara é o único posicional, e deste modo, seu nome pode ser omitido::
+        O parâmetro mascara é o único posicional, e deste modo, seu nome pode
+        ser omitido::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> campo = CampoBase(r'COO:(\d+)')
@@ -42,7 +42,8 @@ class CampoBase(object):
 
     ao_atribuir
 
-        Recebe um callback para tratar o valor antes de ser retornado pelo campo.
+        Recebe um callback para tratar o valor antes de ser retornado pelo
+        campo.
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> def dobro(valor):
@@ -54,47 +55,53 @@ class CampoBase(object):
 
     grupos
 
-        Permite escolher quais grupos capturados o campo deve processar como dados de entrada,
-        utilizado para expressões regulares que utilizam grupos para correspondência da
-        expressão regular, mas que apenas parte destes grupos possui informação útil.
+        Permite escolher quais grupos capturados o campo deve processar como
+        dados de entrada, utilizado para expressões regulares que utilizam
+        grupos para correspondência da expressão regular, mas que apenas parte
+        destes grupos possui informação útil.
 
-        Pode-se informar um número inteiro, que será o índice do grupo, inicando em 0:
+        Pode-se informar um número inteiro, que será o índice do grupo,
+        inicando em 0::
 
             >>> s = "Contador de Reduções Z:                     1246"
-            >>> campo = CampoBase(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', grupos=1, ao_atribuir=int)
+            >>> campo = CampoBase(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
+                grupos=1, ao_atribuir=int)
             >>> campo.analizar_linha(s)
             1246
 
-        Ou uma lista de inteiros:
+        Ou uma lista de inteiros::
 
             >>> s = "Data do movimento: 02/01/2013 10:21:51"
-            >>> campo = CampoBase(r'^Data do (movimento|cupom): (\d+)/(\d+)/(\d+)', grupos=[1, 2, 3])
-            >>> campo.analizar_linha(s)
+            >>> c = CampoBase(r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)',\
+                grupos=[1, 2, 3])
+            >>> c.analizar_linha(s)
             ['02', '01', '2013']
 
 
     valor_padrao
 
-        Valor que será utilizado no :py:class:`~raspador.analizador.Analizador`, quando o campo não retornar valor após a análise das
+        Valor que será utilizado no :py:class:`~raspador.analizador.Analizador`
+        , quando o campo não retornar valor após a análise das
         linhas recebidas.
 
 
     lista
 
-        Quando especificado, retorna o valor como uma lista:
+        Quando especificado, retorna o valor como uma lista::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> campo = CampoBase(r'COO:(\d+)', lista=True)
             >>> campo.analizar_linha(s)
             ['022734']
 
-        Por convenção, quando um campo retorna uma lista, o :py:class:`~raspador.analizador.Analizador`
-        acumula os valores retornados pelo campo.
-
+        Por convenção, quando um campo retorna uma lista, o
+        :py:class:`~raspador.analizador.Analizador` acumula os valores
+        retornados pelo campo.
     """
     def __init__(self, mascara=None, **kwargs):
+        class_unique_name = self.__class__.__name__ + str(id(self))
         if not hasattr(self, 'nome'):
-            self.nome = kwargs.get('nome', self.__class__.__name__ + str(id(self)))
+            self.nome = kwargs.get('nome', class_unique_name)
 
         self.valor_padrao = kwargs.get('valor_padrao')
         self.lista = kwargs.get('lista', False)
@@ -102,11 +109,12 @@ class CampoBase(object):
         self.ao_atribuir = kwargs.get('ao_atribuir')
         self.grupos = kwargs.get('grupos', [])
 
-        if self.ao_atribuir and not isinstance(self.ao_atribuir, collections.Callable):
+        if self.ao_atribuir and \
+                not isinstance(self.ao_atribuir, collections.Callable):
             raise TypeError('O callback ao_atribuir não é uma função.')
 
-        if not (isinstance(self.grupos, list) or isinstance(self.grupos, tuple)):
-            self.grupos = [self.grupos, ]
+        if not hasattr(self.grupos, '__iter__'):
+            self.grupos = (self.grupos,)
 
         self._iniciar()
 
@@ -119,7 +127,10 @@ class CampoBase(object):
         pass
 
     def atribuir_analizador(self, analizador):
-        "Recebe uma referência fraca de :py:class:`~raspador.analizador.Analizador`"
+        """
+        Recebe uma referência fraca de
+        :py:class:`~raspador.analizador.Analizador`
+        """
         self.analizador = analizador
 
     def _resultado_valido(self, valor):
@@ -138,7 +149,8 @@ class CampoBase(object):
 
     def _para_python(self, valor):
         """
-        Converte o valor recebido palo parser para o tipo de dado nativo do python.
+        Converte o valor recebido palo parser para o tipo de dado
+        nativo do python
         """
         return valor
 
@@ -163,7 +175,8 @@ class CampoBase(object):
                 valor = self._para_python(valor)
                 if self.ao_atribuir:
                     valor = self.ao_atribuir(valor)
-                if valor is not None and self.lista and not isinstance(valor, list):
+                if valor is not None and self.lista \
+                        and not isinstance(valor, list):
                     valor = [valor]
                 return valor
 
@@ -225,8 +238,6 @@ class CampoData(CampoBase):
         self.formato = kwargs.get('formato', '%d/%m/%Y')
 
     def _para_python(self, valor):
-        if isinstance(valor, date):
-            return valor
         return datetime.strptime(valor, self.formato).date()
 
 
@@ -247,6 +258,9 @@ class CampoDataHora(CampoBase):
         self.formato = kwargs.get('formato', '%d/%m/%Y %H:%M:%S')
 
     def _para_python(self, valor):
-        if isinstance(valor, datetime):
-            return valor
         return datetime.strptime(valor, self.formato)
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

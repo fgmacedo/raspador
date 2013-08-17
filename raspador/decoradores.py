@@ -12,10 +12,10 @@ class ProxyDeCampo(object):
 
 class ProxyConcatenaAteRE(ProxyDeCampo):
     """
-    Proxy que faz cache de linhas recebidas.
-    Quando recebe uma linha para análise, envia a linha ao cache,
-        até encontrar um match da linha recebida com a expressão regular de término,
-        e então envia o acumulado das linhas recebidas para o decorado.
+    Proxy que faz cache de linhas recebidas. Quando recebe uma linha para
+    análise, envia a linha ao cache, até encontrar um match da linha recebida
+    com a expressão regular de término, e então envia o acumulado das linhas
+    recebidas para o decorado.
     """
     def __init__(self, campo, uniao, re_fim):
         super(ProxyConcatenaAteRE, self).__init__(campo)

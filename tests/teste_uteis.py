@@ -45,8 +45,9 @@ def assertDicionario(self, a, b, mensagem=''):
     def diff(msg, fn):
         q = getattr(d, fn)()
         if mensagem:
-            msg = mensagem +'. '+ msg
-        m = 'chaves %s: %r, esperado:%r != encontrado:%r' % (msg, q, a, b,) if q else ''
+            msg = mensagem + '. ' + msg
+        m = 'chaves %s: %r, esperado:%r != encontrado:%r' % \
+            (msg, q, a, b,) if q else ''
         self.assertFalse(q, m)
 
     diff('adicionadas', 'added')

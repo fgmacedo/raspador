@@ -25,11 +25,15 @@ class TesteDeCampoBase(unittest.TestCase):
         self.assertEqual(valor, 45468)  # 45468 = 2 x 22734
 
     def teste_deve_recusar_callback_invalido(self):
-        self.assertRaises(TypeError, lambda: CampoBase(r'COO:(\d+)', ao_atribuir='pegadinha'))
+        self.assertRaises(
+            TypeError,
+            lambda: CampoBase(r'COO:(\d+)', ao_atribuir='pegadinha')
+        )
 
     def teste_deve_utilizar_grupo_quando_informado(self):
         s = "Contador de Reduções Z:                     1246"
-        campo = CampoBase(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', grupos=1, ao_atribuir=int)
+        campo = CampoBase(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', grupos=1,
+                          ao_atribuir=int)
         valor = campo.analizar_linha(s)
         self.assertEqual(valor, 1246)
 
@@ -45,13 +49,13 @@ class TesteDeCampoInteiro(unittest.TestCase):
 class TesteDeCampoNumerico(unittest.TestCase):
     def teste_deve_obter_valor(self):
         s = "VENDA BRUTA DIÁRIA:                    793,00"
-        campo = CampoNumerico(r'VENDA BRUTA DIÁRIA:\s+(\d+,\d+)', nome='VendaBruta')
+        campo = CampoNumerico(r'VENDA BRUTA DIÁRIA:\s+(\d+,\d+)')
         valor = campo.analizar_linha(s)
         self.assertEqual(valor, 793.0)
 
     def teste_deve_obter_valor_com_separador_de_milhar(self):
         s = "VENDA BRUTA DIÁRIA:                  10.036,70"
-        campo = CampoNumerico(r'VENDA BRUTA DIÁRIA:\s+([\d.]+,\d+)', nome='VendaBruta')
+        campo = CampoNumerico(r'VENDA BRUTA DIÁRIA:\s+([\d.]+,\d+)')
         valor = campo.analizar_linha(s)
         self.assertEqual(valor, 10036.7)
 
@@ -99,14 +103,15 @@ class TesteDeCampoData(unittest.TestCase):
 class TesteDeCampoDataHora(unittest.TestCase):
     def teste_deve_obter_valor(self):
         s = "02/01/2013 10:21:51           COO:022734"
-        campo = CampoDataHora(r'^(\d+/\d+/\d+ \d+:\d+:\d+)', nome='Data')
+        campo = CampoDataHora(r'^(\d+/\d+/\d+ \d+:\d+:\d+)')
         valor = campo.analizar_linha(s)
         data_esperada = datetime(2013, 1, 2, 10, 21, 51)
         self.assertEqual(valor, data_esperada)
 
     def teste_deve_obter_respeitando_formato(self):
         s = "2013-01-02T10:21:51           COO:022734"
-        campo = CampoDataHora(r'^(\d+-\d+-\d+T\d+:\d+:\d+)', nome='Data', formato='%Y-%m-%dT%H:%M:%S')
+        campo = CampoDataHora(r'^(\d+-\d+-\d+T\d+:\d+:\d+)',
+                              formato='%Y-%m-%dT%H:%M:%S')
         valor = campo.analizar_linha(s)
         data_esperada = datetime(2013, 1, 2, 10, 21, 51)
         self.assertEqual(valor, data_esperada)

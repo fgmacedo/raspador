@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class AuxiliarDeAnalizador(object):
     """
     Classe auxiliar para definir comportamentos que serão adicionados
@@ -78,7 +79,8 @@ class AuxiliarDeAnalizador(object):
 
             for linha in self.cache.consumir():
                 for nome, campo in list(self._campos.items()):
-                    if nome in self.retorno and hasattr(campo, 'lista') and not campo.lista:
+                    if nome in self.retorno and \
+                            hasattr(campo, 'lista') and not campo.lista:
                         continue
                     valor = campo.analizar_linha(linha)
                     if valor is not None:
@@ -100,7 +102,8 @@ class AuxiliarDeAnalizador(object):
         for nome, campo in list(self._campos.items()):
             if not nome in self.retorno:
                 valor = None
-                if hasattr(campo, 'finalizar') and isinstance(campo.finalizar, collections.Callable):
+                if hasattr(campo, 'finalizar') and \
+                        isinstance(campo.finalizar, collections.Callable):
                     valor = campo.finalizar()
                 if valor is None:
                     valor = campo.valor_padrao
@@ -130,20 +133,21 @@ class MetaclasseDeAnalizador(type):
     Metaclasse responsável por descobrir os coletores de informações associados
     à um parser.
     """
-    def __new__(self, nome_classe, ancestrais, atributos):
-        if object in ancestrais:
-            ancestrais = tuple([c for c in ancestrais if c != object])
+    def __new__(self, name, bases, attrs):
+        if object in bases:
+            bases = tuple([c for c in bases if c != object])
 
-        return type.__new__(self, nome_classe, ancestrais + (AuxiliarDeAnalizador,), atributos)
+        return type.__new__(self, name, bases + (AuxiliarDeAnalizador,), attrs)
 
-    def __init__(cls, nome_classe, ancestrais, atributos):
-        super(MetaclasseDeAnalizador, cls).__init__(nome_classe, ancestrais, atributos)
+    def __init__(cls, name, bases, attrs):
+        super(MetaclasseDeAnalizador, cls).__init__(name, bases, attrs)
 
-        cls._campos = {k: v for k, v in list(atributos.items()) if
-            hasattr(v, 'analizar_linha') and not isinstance(v, type)}
+        cls._campos = {k: v for k, v in list(attrs.items())
+                       if hasattr(v, 'analizar_linha')
+                       and not isinstance(v, type)}
 
-        cls.adicionar_atributo_re(cls, atributos, 'inicio')
-        cls.adicionar_atributo_re(cls, atributos, 'fim')
+        cls.adicionar_atributo_re(cls, attrs, 'inicio')
+        cls.adicionar_atributo_re(cls, attrs, 'fim')
 
         if not hasattr(cls, 'qtd_linhas_cache'):
             cls.qtd_linhas_cache = 0
@@ -161,7 +165,7 @@ class MetaclasseDeAnalizador(type):
             setattr(cls, '_' + nome, re.compile(expressao))
 
     @classmethod
-    def __prepare__(self, nome_classe, ancestrais):
+    def __prepare__(self, name, bases):
         return Dicionario()
 
 

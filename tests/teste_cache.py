@@ -33,8 +33,8 @@ class Test_Cache(unittest.TestCase):
     def test_deve_retornar_tamanho_da_lista(self):
         self.cache.adicionar(1)
         self.cache.adicionar(2)
-        self.assertEqual(len(self.cache), 2, 'cache não retornou tamanho real da lista')
+        self.assertEqual(len(self.cache), 2)
         self.cache.adicionar(3)
         self.cache.adicionar(4)
         self.cache.adicionar(5)
-        self.assertEqual(len(self.cache), 3, 'cache não retornou tamanho real da lista')
+        self.assertEqual(len(self.cache), 3)

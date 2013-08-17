@@ -1,6 +1,7 @@
 #coding: utf-8
 import unittest
-from raspador import ProxyDeCampo, ProxyConcatenaAteRE, Cache
+
+from raspador import ProxyDeCampo, ProxyConcatenaAteRE
 
 
 class CampoFake(object):
