@@ -63,8 +63,6 @@ class AuxiliarDeAnalizador(object):
             res = self.finalizar()
             if res:
                 yield res
-        except Exception:
-            raise
 
     def analizar_linha(self, linha):
         self.cache.adicionar(linha)

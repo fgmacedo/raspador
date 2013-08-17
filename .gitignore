@@ -10,3 +10,6 @@ env*
 build
 dist
 raspador.egg-info
+
+#Editors
+*.sublime*

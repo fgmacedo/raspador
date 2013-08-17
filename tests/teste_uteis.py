@@ -2,7 +2,7 @@
 import os
 import sys
 
-OBTER_CAMINHO = lambda x: os.path.join(os.path.dirname(__file__), x)
+full_path = lambda x: os.path.join(os.path.dirname(__file__), x)
 
 
 def incluir_diretorio_raiz():

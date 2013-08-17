@@ -3,10 +3,67 @@ import unittest
 import re
 import collections
 import codecs
-from .teste_uteis import OBTER_CAMINHO, assertDicionario
+from .teste_uteis import full_path, assertDicionario
 from raspador.analizador import Analizador, Dicionario
 from raspador.campos import CampoBase, CampoNumerico, \
     CampoInteiro, CampoBooleano
+
+
+class CampoItem(CampoBase):
+    def _iniciar(self):
+        self.mascara = r'(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)'
+
+    def _para_python(self, r):
+        return Dicionario(
+            Item=int(r[0]),
+            Codigo=r[1],
+            Descricao=r[2],
+            Qtd=float(re.sub(r'[,.]', '.', r[3])),
+            Unidade=r[4],
+            ValorUnitario=float(re.sub(r'[,.]', '.', r[5])),
+            Aliquota=r[6],
+            ValorTotal=float(re.sub(r'[,.]', '.', r[7])),
+        )
+
+
+class ExtratorDeDados(Analizador):
+    inicio = r'^\s+CUPOM FISCAL\s+$'
+    fim = r'^FAB:.*BR$'
+    qtd_linhas_cache = 1
+    COO = CampoInteiro(r'COO:\s?(\d+)')
+    Cancelado = CampoBooleano(r'^\s+(CANCELAMENTO)\s+$')
+    Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
+    Itens = CampoItem(lista=True)
+
+
+class TotalizadoresNaoFiscais(Analizador):
+    class CampoNF(CampoBase):
+        def _iniciar(self):
+            self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
+
+        def _para_python(self, v):
+            return Dicionario(
+                N=int(v[0]),
+                Operacao=v[1].strip(),
+                CON=int(v[2]),
+                ValorAcumulado=float(re.sub('[,.]', '.', v[3])),
+            )
+
+    inicio = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
+    fim = r'^[\s-]*$'
+    Totalizador = CampoNF(lista=True)
+
+    def processar_retorno(self):
+        self.retorno = self.retorno.Totalizador
+
+
+class AnalizadorDeReducaoZ(Analizador):
+    inicio = r'^\s+REDUÇÃO Z\s+$'
+    fim = r'^FAB:.*BR$'
+    qtd_linhas_cache = 1
+    COO = CampoInteiro(r'COO:\s*(\d+)')
+    CRZ = CampoInteiro(r'Contador de Redução Z:\s*(\d+)')
+    Totalizadores = TotalizadoresNaoFiscais()
 
 
 class BaseParaTestesComApiDeArquivo(unittest.TestCase):
@@ -53,32 +110,9 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
     codificacao_arquivo = 'utf-8'
 
     def obter_arquivo(self):
-        return open(OBTER_CAMINHO('arquivos/cupom.txt'))
+        return open(full_path('arquivos/cupom.txt'))
 
     def criar_analizador(self):
-        class CampoItem(CampoBase):
-            def _iniciar(self):
-                self.mascara = r'(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)'
-
-            def _para_python(self, r):
-                return Dicionario(
-                    Item=int(r[0]),
-                    Codigo=r[1],
-                    Descricao=r[2],
-                    Qtd=float(re.sub(r'[,.]', '.', r[3])),
-                    Unidade=r[4],
-                    ValorUnitario=float(re.sub(r'[,.]', '.', r[5])),
-                    Aliquota=r[6],
-                    ValorTotal=float(re.sub(r'[,.]', '.', r[7])),
-                )
-
-        class ExtratorDeDados(Analizador):
-            inicio = r'^\s+CUPOM FISCAL\s+$'
-            fim = r'^FAB:.*BR$'
-            qtd_linhas_cache = 1
-            COO = CampoInteiro(r'COO:\s?(\d+)')
-            Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
-            Itens = CampoItem(lista=True)
         return ExtratorDeDados()
 
     def teste_deve_encontrar_cupom(self):
@@ -87,6 +121,7 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
     def teste_deve_emitir_dicionario_com_valores(self):
         item = {
             "COO": 24422,
+            "Cancelado": False,
             "Total": 422.2,
             "Itens": [
                 {"Item": 1, "Codigo": "872", "Descricao": "#POLENTA FINA", "Qtd": 2, "Unidade": "UN", "ValorUnitario": 11.00, "Aliquota": "Te", "ValorTotal": 22.00},
@@ -106,50 +141,18 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
 
 class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
     def obter_arquivo(self):
-        return open(OBTER_CAMINHO('arquivos/cupom.txt'))
+        return open(full_path('arquivos/cupom.txt'))
 
     def criar_analizador(self):
-
         class ExtratorDeDados(Analizador):
             inicio = r'^\s+CUPOM FISCAL\s+$'
             fim = r'^FAB:.*BR$'
             Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
+
         return ExtratorDeDados()
 
     def teste_deve_retornar_valores(self):
         self.assertEqual(len(self.itens), 1)
-
-
-class TesteExtrairDadosDeCupons(BaseParaTestesComApiDeArquivo):
-
-    def obter_arquivo(self):
-        "sobrescrever retornando arquivo"
-        return open(OBTER_CAMINHO('arquivos/cupom.txt'))
-
-
-    def criar_analizador(self):
-
-        class ExtratorDeDados(Analizador):
-            inicio = r'^\s+CUPOM FISCAL\s+$'
-            fim = r'^FAB:.*BR$'
-            qtd_linhas_cache = 1
-            COO = CampoNumerico(r'COO:\s*(\d+)$')
-            Cancelado = CampoBooleano(r'^\s+(CANCELAMENTO)\s+$')
-            Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
-        return ExtratorDeDados()
-
-    def teste_obter_qtd_cupons(self):
-        self.assertEqual(len(self.itens), 1)
-
-    def teste_se_item_esta_correto(self):
-        itens = [
-            {
-                "COO": 24422,
-                "Total": 422.2,
-                "Cancelado": False
-            },
-        ]
-        self.assertEqual(self.itens[:3], itens)
 
 
 class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
@@ -157,37 +160,9 @@ class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
 
     def obter_arquivo(self):
         "sobrescrever retornando arquivo"
-        return open(OBTER_CAMINHO('arquivos/reducaoz.txt'))
+        return open(full_path('arquivos/reducaoz.txt'))
 
     def criar_analizador(self):
-        class TotalizadoresNaoFiscais(Analizador):
-            class CampoNF(CampoBase):
-                def _iniciar(self):
-                    self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
-
-                def _para_python(self, v):
-                    return Dicionario(
-                        N=int(v[0]),
-                        Operacao=v[1].strip(),
-                        CON=int(v[2]),
-                        ValorAcumulado=float(re.sub('[,.]', '.', v[3])),
-                    )
-
-            inicio = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
-            fim = r'^[\s-]*$'
-            Totalizador = CampoNF(lista=True)
-
-            def processar_retorno(self):
-                self.retorno = self.retorno.Totalizador
-
-        class AnalizadorDeReducaoZ(Analizador):
-            inicio = r'^\s+REDUÇÃO Z\s+$'
-            fim = r'^FAB:.*BR$'
-            qtd_linhas_cache = 1
-            COO = CampoInteiro(r'COO:\s*(\d+)')
-            CRZ = CampoInteiro(r'Contador de Redução Z:\s*(\d+)')
-            Totalizadores = TotalizadoresNaoFiscais()
-
         return AnalizadorDeReducaoZ()
 
     def teste_deve_retornar_dados(self):

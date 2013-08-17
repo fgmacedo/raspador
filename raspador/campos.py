@@ -250,8 +250,3 @@ class CampoDataHora(CampoBase):
         if isinstance(valor, datetime):
             return valor
         return datetime.strptime(valor, self.formato)
-
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
