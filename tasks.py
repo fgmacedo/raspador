@@ -2,12 +2,12 @@ from invoke import run, task
 
 
 @task
-def limpar():
+def clean():
     run('git clean -Xfd')
 
 
 @task
-def testar():
+def test():
     commands = ['nosetests', 'flake8']
     for c in commands:
         run('{} raspador tests'.format(c))
