@@ -37,13 +37,6 @@ Testes
 
 Os testes dependem de algumas bibliotecas externas:
 
-.. include:: requirements_dev.txt
-    :literal:
-
-..
-    include directive doesn't seen to work with github, including a copy-paste
-    version here
-
 .. code-block:: text
 
     coverage==3.6
