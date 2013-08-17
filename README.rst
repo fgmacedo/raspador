@@ -40,6 +40,17 @@ Os testes dependem de algumas bibliotecas externas:
 .. include:: requirements_dev.txt
     :literal:
 
+..
+    include directive doesn't seen to work with github, including a copy-paste
+    version here
+
+.. code-block:: text
+
+    coverage==3.6
+    nose==1.3.0
+    flake8==2.0
+    invoke==0.5.0
+
 
 Você pode executar os testes com ``nosetests``:
 
