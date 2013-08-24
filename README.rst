@@ -1,6 +1,19 @@
 raspador
 ========
 
+.. image:: https://api.travis-ci.org/fgmacedo/raspador.png
+        :target: https://travis-ci.org/fgmacedo/raspador
+
+.. image:: https://coveralls.io/repos/fgmacedo/raspador/badge.png
+        :target: https://coveralls.io/r/fgmacedo/raspador
+
+.. image:: https://pypip.in/v/raspador/badge.png
+        :target: https://pypi.python.org/pypi/raspador
+
+.. image:: https://pypip.in/d/raspador/badge.png
+        :target: https://crate.io/packages/raspador/
+
+
 Biblioteca para extração de dados em documentos semi-estruturados.
 
 A definição dos extratores é feita através de classes como modelos, de forma
