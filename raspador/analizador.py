@@ -142,9 +142,9 @@ class MetaclasseDeAnalizador(type):
     def __init__(cls, name, bases, attrs):
         super(MetaclasseDeAnalizador, cls).__init__(name, bases, attrs)
 
-        cls._campos = {k: v for k, v in list(attrs.items())
-                       if hasattr(v, 'analizar_linha')
-                       and not isinstance(v, type)}
+        cls._campos = dict((k, v) for k, v in list(attrs.items())
+                           if hasattr(v, 'analizar_linha')
+                           and not isinstance(v, type))
 
         cls.adicionar_atributo_re(cls, attrs, 'inicio')
         cls.adicionar_atributo_re(cls, attrs, 'fim')

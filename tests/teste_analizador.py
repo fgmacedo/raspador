@@ -84,8 +84,10 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
 
         self.itens = self.analizar()
         cupom_or_reduz = lambda x: x.get('Cupom', x.get('ReducaoZ'))
-        self.itens_dict = {cupom_or_reduz(item).COO: cupom_or_reduz(item) for
-                           item in self.itens if cupom_or_reduz(item)}
+        self.itens_dict = dict(
+            (cupom_or_reduz(item).COO, cupom_or_reduz(item)) for
+            item in self.itens if cupom_or_reduz(item)
+        )
         if self.fazer_cache_itens:
             self.__class__.cache_itens = self.itens
             self.__class__.cache_itens_dict = self.itens_dict
