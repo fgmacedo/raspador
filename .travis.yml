@@ -5,5 +5,7 @@ python:
   - "3.2"
   - "3.3"
   - "pypy"
-install: "pip install -r requirements_dev.txt --use-mirrors"
+install:
+  - "pip install -r requirements_dev.txt --use-mirrors"
+  - "pip install ordereddict --use-mirrors"
 script: nosetests

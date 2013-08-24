@@ -1,5 +1,9 @@
 #coding: utf-8
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except:
+    # Python 2.6 alternative
+    from ordereddict import OrderedDict
 
 
 class Dicionario(OrderedDict):
