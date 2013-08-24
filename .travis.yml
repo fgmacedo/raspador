@@ -7,5 +7,9 @@ python:
   - "pypy"
 install:
   - "pip install -r requirements_dev.txt --use-mirrors"
+  # For Python 2.6 support
   - "pip install ordereddict --use-mirrors"
+  - "pip install coveralls"
 script: nosetests
+after_success:
+  - coveralls
