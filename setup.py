@@ -14,6 +14,6 @@ setup(
     long_description=long_description,
     license='MIT',
     url="http://github.org/fgmacedo/raspador",
-    version='0.1.2',
+    version='0.1.3',
     packages=['raspador'],
 )
