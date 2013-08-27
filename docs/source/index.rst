@@ -7,8 +7,7 @@ Conteúdo:
    :maxdepth: 2
 
    raspador
-   administracao
-   glossario
+
 
 Índices e tabelas
 ==================
