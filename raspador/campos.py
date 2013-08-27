@@ -105,7 +105,7 @@ class CampoBase(object):
 
         self.valor_padrao = kwargs.get('valor_padrao')
         self.lista = kwargs.get('lista', False)
-        self.mascara = re.compile(mascara) if mascara else None
+        self.mascara = mascara
         self.ao_atribuir = kwargs.get('ao_atribuir')
         self.grupos = kwargs.get('grupos', [])
 

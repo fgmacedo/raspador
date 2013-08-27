@@ -8,11 +8,18 @@ from raspador.campos import CampoBase, CampoString, CampoNumerico, \
 
 
 class TesteDeCampoBase(unittest.TestCase):
+
     def teste_deve_retornar_valor_no_analizar(self):
         s = "02/01/2013 10:21:51           COO:022734"
         campo = CampoBase(r'COO:(\d+)', nome='COO')
         valor = campo.analizar_linha(s)
         self.assertEqual(valor, '022734')
+
+    def teste_deve_retornar_none_sem_mascara(self):
+        s = "02/01/2013 10:21:51           COO:022734"
+        campo = CampoBase()
+        valor = campo.analizar_linha(s)
+        self.assertEqual(valor, None)
 
     def teste_deve_aceitar_callback(self):
         s = "02/01/2013 10:21:51           COO:022734"
