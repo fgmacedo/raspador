@@ -1,17 +1,17 @@
-Documentação do raspador
-========================
+.. _topics-index:
 
-Conteúdo:
+================================
+Raspador |version| documentation
+================================
+
+
 
 .. toctree::
-   :maxdepth: 2
+    :hidden:
 
-   raspador
+   intro/overview
+   intro/install
+   intro/tutorial
 
 
-Índices e tabelas
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Looking for specific information? Try the :ref:`genindex` or :ref:`modindex`.

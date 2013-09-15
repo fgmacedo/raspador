@@ -98,7 +98,7 @@ Extrator de dados em logs
 .. code-block:: python
 
     import json
-    from raspador import Analizador, CampoString
+    from raspador import Parser, CampoString
 
     out = """
     PART:/dev/sda1 UUID:423k34-3423lk423-sdfsd-43 TYPE:ext4
@@ -107,7 +107,7 @@ Extrator de dados em logs
     """
 
 
-    class AnalizadorDeLog(Analizador):
+    class ParserDeLog(Parser):
         inicio = r'^PART.*'
         fim = r'^PART.*'
         PART = CampoString(r'PART:([^\s]+)')
@@ -115,7 +115,7 @@ Extrator de dados em logs
         TYPE = CampoString(r'TYPE:([^\s]+)')
 
 
-    a = AnalizadorDeLog()
+    a = ParserDeLog()
 
     # res é um gerador
     res = a.analizar(linha for linha in out.splitlines())

@@ -2,7 +2,7 @@
 import unittest
 import re
 from .teste_uteis import full_path, assertDicionario
-from raspador.analizador import Analizador, Dicionario
+from raspador.analizador import Parser, Dicionario
 from raspador.campos import CampoBase, CampoNumerico, \
     CampoInteiro, CampoBooleano
 
@@ -25,7 +25,7 @@ class CampoItem(CampoBase):
         )
 
 
-class ExtratorDeDados(Analizador):
+class ExtratorDeDados(Parser):
     inicio = r'^\s+CUPOM FISCAL\s+$'
     fim = r'^FAB:.*BR$'
     qtd_linhas_cache = 1
@@ -35,7 +35,7 @@ class ExtratorDeDados(Analizador):
     Itens = CampoItem(lista=True)
 
 
-class TotalizadoresNaoFiscais(Analizador):
+class TotalizadoresNaoFiscais(Parser):
     class CampoNF(CampoBase):
         def _iniciar(self):
             self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
@@ -56,7 +56,7 @@ class TotalizadoresNaoFiscais(Analizador):
         self.retorno = self.retorno.Totalizador
 
 
-class AnalizadorDeReducaoZ(Analizador):
+class ParserDeReducaoZ(Parser):
     inicio = r'^\s+REDUÇÃO Z\s+$'
     fim = r'^FAB:.*BR$'
     qtd_linhas_cache = 1
@@ -238,7 +238,7 @@ class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
         return open(full_path('arquivos/cupom.txt'))
 
     def criar_analizador(self):
-        class ExtratorDeDados(Analizador):
+        class ExtratorDeDados(Parser):
             inicio = r'^\s+CUPOM FISCAL\s+$'
             fim = r'^FAB:.*BR$'
             Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
@@ -249,7 +249,7 @@ class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
         self.assertEqual(len(self.itens), 1)
 
 
-class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
+class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
     codificacao_arquivo = 'utf-8'
 
     def obter_arquivo(self):
@@ -257,7 +257,7 @@ class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
         return open(full_path('arquivos/reducaoz.txt'))
 
     def criar_analizador(self):
-        return AnalizadorDeReducaoZ()
+        return ParserDeReducaoZ()
 
     def teste_deve_retornar_dados(self):
         reducao = [

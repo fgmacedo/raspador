@@ -1,4 +1,5 @@
 
+========
 raspador
 ========
 
@@ -6,7 +7,7 @@ O módulo raspador fornece estrutura genérica para extração de dados a partir
 arquivos texto semi-estruturados.
 
 
-Analizador
+Parser
 ----------
 
 .. automodule:: raspador.analizador

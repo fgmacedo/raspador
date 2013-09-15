@@ -10,18 +10,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AuxiliarDeAnalizador(object):
+class ParserMixin(object):
     """
     Classe auxiliar para definir comportamentos que serão adicionados
     em todos os analizadores através de herança múltipla.
     Padrão mix-in.
     """
+
+    qtd_linhas_cache = 0
+    default_item_class = Dicionario
+
     def __init__(self):
         self.tem_busca_inicio = hasattr(self, '_inicio')
         self.tem_busca_fim = hasattr(self, '_fim')
         self.inicio_encontrado = not self.tem_busca_inicio
         self.cache = Cache(self.qtd_linhas_cache + 1)
-        self.valor_padrao = None
         self._atribuir_analizador_nos_campos()
 
     def _atribuir_analizador_nos_campos(self):
@@ -73,7 +76,7 @@ class AuxiliarDeAnalizador(object):
 
         if self.inicio_encontrado:
             if not self.tem_retorno:
-                self.retorno = Dicionario()
+                self.retorno = self.default_item_class()
             if self.tem_busca_fim:
                 self.inicio_encontrado = not bool(self._fim.match(linha))
 
@@ -128,19 +131,18 @@ class AuxiliarDeAnalizador(object):
         pass
 
 
-class MetaclasseDeAnalizador(type):
+class ParserMetaclass(type):
     """
-    Metaclasse responsável por descobrir os coletores de informações associados
-    à um parser.
+    Collect data-extractors into a field collection.
     """
     def __new__(self, name, bases, attrs):
         if object in bases:
             bases = tuple([c for c in bases if c != object])
 
-        return type.__new__(self, name, bases + (AuxiliarDeAnalizador,), attrs)
+        return type.__new__(self, name, bases + (ParserMixin,), attrs)
 
     def __init__(cls, name, bases, attrs):
-        super(MetaclasseDeAnalizador, cls).__init__(name, bases, attrs)
+        super(ParserMetaclass, cls).__init__(name, bases, attrs)
 
         cls._campos = dict((k, v) for k, v in list(attrs.items())
                            if hasattr(v, 'analizar_linha')
@@ -148,9 +150,6 @@ class MetaclasseDeAnalizador(type):
 
         cls.adicionar_atributo_re(cls, attrs, 'inicio')
         cls.adicionar_atributo_re(cls, attrs, 'fim')
-
-        if not hasattr(cls, 'qtd_linhas_cache'):
-            cls.qtd_linhas_cache = 0
 
         if not hasattr(cls, 'retornar_ao_obter_valor'):
             cls.retornar_ao_obter_valor = False
@@ -166,7 +165,7 @@ class MetaclasseDeAnalizador(type):
 
     @classmethod
     def __prepare__(self, name, bases):
-        return Dicionario()
+        return self.default_item_class()
 
 
-Analizador = MetaclasseDeAnalizador('Analizador', (object,), {})
+Parser = ParserMetaclass('Parser', (object,), {})

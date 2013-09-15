@@ -80,7 +80,7 @@ class CampoBase(object):
 
     valor_padrao
 
-        Valor que será utilizado no :py:class:`~raspador.analizador.Analizador`
+        Valor que será utilizado no :py:class:`~raspador.analizador.Parser`
         , quando o campo não retornar valor após a análise das
         linhas recebidas.
 
@@ -95,7 +95,7 @@ class CampoBase(object):
             ['022734']
 
         Por convenção, quando um campo retorna uma lista, o
-        :py:class:`~raspador.analizador.Analizador` acumula os valores
+        :py:class:`~raspador.analizador.Parser` acumula os valores
         retornados pelo campo.
     """
     def __init__(self, mascara=None, **kwargs):
@@ -129,7 +129,7 @@ class CampoBase(object):
     def atribuir_analizador(self, analizador):
         """
         Recebe uma referência fraca de
-        :py:class:`~raspador.analizador.Analizador`
+        :py:class:`~raspador.analizador.Parser`
         """
         self.analizador = analizador
 
