@@ -59,7 +59,7 @@ class ParserMixin(object):
         try:
             while True:
                 linha = next(arquivo)
-                linha = self.converter_linha(linha, codificacao)
+                # linha = self.converter_linha(linha, codificacao)
                 res = self.analizar_linha(linha)
                 if res:
                     yield res
@@ -69,6 +69,7 @@ class ParserMixin(object):
                 yield res
 
     def analizar_linha(self, linha):
+        logger.debug('analizar_linha: %s', linha)
         self.cache.adicionar(linha)
 
         if self.tem_busca_inicio and not self.inicio_encontrado:
@@ -162,10 +163,6 @@ class ParserMetaclass(type):
         if nome in atributos:
             expressao = atributos[nome]
             setattr(cls, '_' + nome, re.compile(expressao))
-
-    @classmethod
-    def __prepare__(self, name, bases):
-        return self.default_item_class()
 
 
 Parser = ParserMetaclass('Parser', (object,), {})

@@ -1,10 +1,64 @@
 #coding: utf-8
+import os
+import sys
 import unittest
+import codecs
 import re
-from .teste_uteis import full_path, assertDicionario
+
+sys.path.append('../')
+
 from raspador.analizador import Parser, Dicionario
 from raspador.campos import BaseField, FloatField, \
     IntegerField, BooleanField
+
+
+full_path = lambda x: os.path.join(os.path.dirname(__file__), x)
+
+
+class DictDiffer(object):
+    """
+    Calculate the difference between two dictionaries as:
+    (1) items added
+    (2) items removed
+    (3) keys same in both but changed values
+    (4) keys same in both and unchanged values
+    """
+    def __init__(self, current_dict, past_dict):
+        self.current_dict, self.past_dict = current_dict, past_dict
+        self.current_keys, self.past_keys = [
+            set(d.keys()) for d in (current_dict, past_dict)
+        ]
+        self.intersect = self.current_keys.intersection(self.past_keys)
+
+    def added(self):
+        return self.current_keys - self.intersect
+
+    def removed(self):
+        return self.past_keys - self.intersect
+
+    def changed(self):
+        return set(o for o in self.intersect
+                   if self.past_dict[o] != self.current_dict[o])
+
+    def unchanged(self):
+        return set(o for o in self.intersect
+                   if self.past_dict[o] == self.current_dict[o])
+
+
+def assertDicionario(self, a, b, mensagem=''):
+    d = DictDiffer(a, b)
+
+    def diff(msg, fn):
+        q = getattr(d, fn)()
+        if mensagem:
+            msg = mensagem + '. ' + msg
+        m = 'chaves %s: %r, esperado:%r != encontrado:%r' % \
+            (msg, q, a, b,) if q else ''
+        self.assertFalse(q, m)
+
+    diff('adicionadas', 'added')
+    diff('removidas', 'removed')
+    diff('alteradas', 'changed')
 
 
 class CampoItem(BaseField):
@@ -106,6 +160,10 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
         return list(self.analizador.analizar(
             self.arquivo,
             codificacao=self.codificacao_arquivo) or [])
+
+    @classmethod
+    def open_file(cls, filename):
+        return codecs.open(full_path(filename), encoding=cls.codificacao_arquivo)
 
     assertDicionario = assertDicionario
 
@@ -254,7 +312,8 @@ class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
 
     def obter_arquivo(self):
         "sobrescrever retornando arquivo"
-        return open(full_path('arquivos/reducaoz.txt'))
+        return self.open_file('arquivos/reducaoz.txt')
+        # return open(full_path('arquivos/reducaoz.txt'), encoding=self.codificacao_arquivo)
 
     def criar_analizador(self):
         return ParserDeReducaoZ()
@@ -285,3 +344,12 @@ class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
             }
         ]
         self.assertDicionario(reducao[0], self.itens[0])
+
+if __name__ == '__main__':
+    import logging
+    logging.basicConfig(
+        filename='example.log',
+        level=logging.DEBUG,
+        format='%(asctime)-15s %(message)s'
+    )
+    unittest.main()
