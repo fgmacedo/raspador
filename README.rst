@@ -98,7 +98,7 @@ Extrator de dados em logs
 .. code-block:: python
 
     import json
-    from raspador import Parser, CampoString
+    from raspador import Parser, StringField
 
     out = """
     PART:/dev/sda1 UUID:423k34-3423lk423-sdfsd-43 TYPE:ext4
@@ -110,9 +110,9 @@ Extrator de dados em logs
     class ParserDeLog(Parser):
         inicio = r'^PART.*'
         fim = r'^PART.*'
-        PART = CampoString(r'PART:([^\s]+)')
-        UUID = CampoString(r'UUID:([^\s]+)')
-        TYPE = CampoString(r'TYPE:([^\s]+)')
+        PART = StringField(r'PART:([^\s]+)')
+        UUID = StringField(r'UUID:([^\s]+)')
+        TYPE = StringField(r'TYPE:([^\s]+)')
 
 
     a = ParserDeLog()

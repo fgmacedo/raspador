@@ -2,8 +2,8 @@
 
 from .analizador import Parser
 from .colecoes import Dicionario
-from .campos import CampoBase, CampoString, CampoNumerico, \
-    CampoInteiro, CampoData, CampoDataHora, CampoBooleano
+from .campos import BaseField, StringField, FloatField, \
+    IntegerField, DateField, DateTimeField, BooleanField
 
 from .decoradores import ProxyDeCampo, ProxyConcatenaAteRE
 

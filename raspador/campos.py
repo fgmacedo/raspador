@@ -13,7 +13,7 @@ from datetime import datetime
 import collections
 
 
-class CampoBase(object):
+class BaseField(object):
     """
     Contém lógica de processamento para extrair dados através de expressões
     regulares, além de prover métodos utilitários que podem ser sobrescritos
@@ -27,7 +27,7 @@ class CampoBase(object):
         onde deve-se especificar um grupo para captura::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = CampoBase(mascara=r'COO:(\d+)')
+            >>> campo = BaseField(mascara=r'COO:(\d+)')
             >>> campo.analizar_linha(s)
             '022734'
 
@@ -35,7 +35,7 @@ class CampoBase(object):
         ser omitido::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = CampoBase(r'COO:(\d+)')
+            >>> campo = BaseField(r'COO:(\d+)')
             >>> campo.analizar_linha(s)
             '022734'
 
@@ -49,7 +49,7 @@ class CampoBase(object):
             >>> def dobro(valor):
             ...     return int(valor) * 2
             ...
-            >>> campo = CampoBase(r'COO:(\d+)', ao_atribuir=dobro)
+            >>> campo = BaseField(r'COO:(\d+)', ao_atribuir=dobro)
             >>> campo.analizar_linha(s)  # 45468 = 2 x 22734
             45468
 
@@ -64,7 +64,7 @@ class CampoBase(object):
         inicando em 0::
 
             >>> s = "Contador de Reduções Z:                     1246"
-            >>> campo = CampoBase(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
+            >>> campo = BaseField(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
                 grupos=1, ao_atribuir=int)
             >>> campo.analizar_linha(s)
             1246
@@ -72,13 +72,13 @@ class CampoBase(object):
         Ou uma lista de inteiros::
 
             >>> s = "Data do movimento: 02/01/2013 10:21:51"
-            >>> c = CampoBase(r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)',\
+            >>> c = BaseField(r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)',\
                 grupos=[1, 2, 3])
             >>> c.analizar_linha(s)
             ['02', '01', '2013']
 
 
-    valor_padrao
+    default
 
         Valor que será utilizado no :py:class:`~raspador.analizador.Parser`
         , quando o campo não retornar valor após a análise das
@@ -90,7 +90,7 @@ class CampoBase(object):
         Quando especificado, retorna o valor como uma lista::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = CampoBase(r'COO:(\d+)', lista=True)
+            >>> campo = BaseField(r'COO:(\d+)', lista=True)
             >>> campo.analizar_linha(s)
             ['022734']
 
@@ -99,11 +99,7 @@ class CampoBase(object):
         retornados pelo campo.
     """
     def __init__(self, mascara=None, **kwargs):
-        class_unique_name = self.__class__.__name__ + str(id(self))
-        if not hasattr(self, 'nome'):
-            self.nome = kwargs.get('nome', class_unique_name)
-
-        self.valor_padrao = kwargs.get('valor_padrao')
+        self.default = kwargs.get('default')
         self.lista = kwargs.get('lista', False)
         self.mascara = mascara
         self.ao_atribuir = kwargs.get('ao_atribuir')
@@ -147,7 +143,7 @@ class CampoBase(object):
             valor = valor[0]  # se houver apenas um item
         return valor
 
-    def _para_python(self, valor):
+    def to_python(self, valor):
         """
         Converte o valor recebido palo parser para o tipo de dado
         nativo do python
@@ -162,17 +158,15 @@ class CampoBase(object):
     def mascara(self, valor):
         self._mascara = re.compile(valor) if valor else None
 
-    def anexar_na_classe(self, cls, nome, informacoes):
+    def anexar_na_classe(self, cls, name):
         self.cls = cls
-        self.nome = nome
-        self.informacoes = informacoes
 
     def analizar_linha(self, linha):
         if self.mascara:
             valor = self._metodo_busca(linha)
             if self._resultado_valido(valor):
                 valor = self._converter(valor)
-                valor = self._para_python(valor)
+                valor = self.to_python(valor)
                 if self.ao_atribuir:
                     valor = self.ao_atribuir(valor)
                 if valor is not None and self.lista \
@@ -181,30 +175,30 @@ class CampoBase(object):
                 return valor
 
 
-class CampoString(CampoBase):
-    def _para_python(self, valor):
+class StringField(BaseField):
+    def to_python(self, valor):
         return str(valor).strip()
 
 
-class CampoNumerico(CampoBase):
-    def _para_python(self, valor):
+class FloatField(BaseField):
+    def to_python(self, valor):
         valor = valor.replace('.', '')
         valor = valor.replace(',', '.')
         return float(valor)
 
 
-class CampoInteiro(CampoBase):
-    def _para_python(self, valor):
+class IntegerField(BaseField):
+    def to_python(self, valor):
         return int(valor)
 
 
-class CampoBooleano(CampoBase):
+class BooleanField(BaseField):
     """
     Retorna verdadeiro se a Regex bater com uma linha completa, e
     se ao menos algum valor for capturado.
     """
     def _iniciar(self):
-        self.valor_padrao = False
+        self.default = False
 
     @property
     def _metodo_busca(self):
@@ -212,16 +206,16 @@ class CampoBooleano(CampoBase):
 
     def _converter(self, valor):
         res = valor.groups() if valor else False
-        return super(CampoBooleano, self)._converter(res)
+        return super(BooleanField, self)._converter(res)
 
     def _resultado_valido(self, valor):
         return valor and (valor.groups())
 
-    def _para_python(self, valor):
+    def to_python(self, valor):
         return bool(valor)
 
 
-class CampoData(CampoBase):
+class DateField(BaseField):
     """
     Campo que mantém dados no formato de data,
     representado em Python por datetine.date.
@@ -234,14 +228,14 @@ class CampoData(CampoBase):
         """
         formato='%d/%m/%Y'
         """
-        super(CampoData, self).__init__(mascara=mascara, **kwargs)
+        super(DateField, self).__init__(mascara=mascara, **kwargs)
         self.formato = kwargs.get('formato', '%d/%m/%Y')
 
-    def _para_python(self, valor):
+    def to_python(self, valor):
         return datetime.strptime(valor, self.formato).date()
 
 
-class CampoDataHora(CampoBase):
+class DateTimeField(BaseField):
     """
     Campo que mantém dados no formato de data/hora,
     representado em Python por datetine.datetime.
@@ -254,10 +248,10 @@ class CampoDataHora(CampoBase):
         """
         formato='%d/%m/%Y %H:%M:%S'
         """
-        super(CampoDataHora, self).__init__(mascara=mascara, **kwargs)
+        super(DateTimeField, self).__init__(mascara=mascara, **kwargs)
         self.formato = kwargs.get('formato', '%d/%m/%Y %H:%M:%S')
 
-    def _para_python(self, valor):
+    def to_python(self, valor):
         return datetime.strptime(valor, self.formato)
 
 

@@ -109,7 +109,7 @@ class ParserMixin(object):
                         isinstance(campo.finalizar, collections.Callable):
                     valor = campo.finalizar()
                 if valor is None:
-                    valor = campo.valor_padrao
+                    valor = campo.default
                 if valor is not None:
                     self.atribuir_valor_ao_retorno(nome, valor)
 
@@ -133,7 +133,7 @@ class ParserMixin(object):
 
 class ParserMetaclass(type):
     """
-    Collect data-extractors into a field collection.
+    Collect data-extractors into a field collection and injects ParserMixin.
     """
     def __new__(self, name, bases, attrs):
         if object in bases:
@@ -156,7 +156,7 @@ class ParserMetaclass(type):
 
         for nome, atributo in list(cls._campos.items()):
             if hasattr(atributo, 'anexar_na_classe'):
-                atributo.anexar_na_classe(cls, nome, cls._campos)
+                atributo.anexar_na_classe(cls, nome)
 
     def adicionar_atributo_re(self, cls, atributos, nome):
         if nome in atributos:

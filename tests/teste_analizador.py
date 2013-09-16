@@ -3,16 +3,16 @@ import unittest
 import re
 from .teste_uteis import full_path, assertDicionario
 from raspador.analizador import Parser, Dicionario
-from raspador.campos import CampoBase, CampoNumerico, \
-    CampoInteiro, CampoBooleano
+from raspador.campos import BaseField, FloatField, \
+    IntegerField, BooleanField
 
 
-class CampoItem(CampoBase):
+class CampoItem(BaseField):
     def _iniciar(self):
         self.mascara = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
                         "\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)")
 
-    def _para_python(self, r):
+    def to_python(self, r):
         return Dicionario(
             Item=int(r[0]),
             Codigo=r[1],
@@ -29,18 +29,18 @@ class ExtratorDeDados(Parser):
     inicio = r'^\s+CUPOM FISCAL\s+$'
     fim = r'^FAB:.*BR$'
     qtd_linhas_cache = 1
-    COO = CampoInteiro(r'COO:\s?(\d+)')
-    Cancelado = CampoBooleano(r'^\s+(CANCELAMENTO)\s+$')
-    Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
+    COO = IntegerField(r'COO:\s?(\d+)')
+    Cancelado = BooleanField(r'^\s+(CANCELAMENTO)\s+$')
+    Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
     Itens = CampoItem(lista=True)
 
 
 class TotalizadoresNaoFiscais(Parser):
-    class CampoNF(CampoBase):
+    class CampoNF(BaseField):
         def _iniciar(self):
             self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
 
-        def _para_python(self, v):
+        def to_python(self, v):
             return Dicionario(
                 N=int(v[0]),
                 Operacao=v[1].strip(),
@@ -60,8 +60,8 @@ class ParserDeReducaoZ(Parser):
     inicio = r'^\s+REDUÇÃO Z\s+$'
     fim = r'^FAB:.*BR$'
     qtd_linhas_cache = 1
-    COO = CampoInteiro(r'COO:\s*(\d+)')
-    CRZ = CampoInteiro(r'Contador de Redução Z:\s*(\d+)')
+    COO = IntegerField(r'COO:\s*(\d+)')
+    CRZ = IntegerField(r'Contador de Redução Z:\s*(\d+)')
     Totalizadores = TotalizadoresNaoFiscais()
 
 
@@ -241,7 +241,7 @@ class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
         class ExtratorDeDados(Parser):
             inicio = r'^\s+CUPOM FISCAL\s+$'
             fim = r'^FAB:.*BR$'
-            Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
+            Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
 
         return ExtratorDeDados()
 
