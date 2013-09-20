@@ -46,20 +46,10 @@ class ParserMixin(object):
     def tem_retorno(self):
         return hasattr(self, 'retorno') and self.retorno is not None
 
-    def converter_linha(self, linha, codificacao):
-        logger.debug('converter_linha (%s): %s', codificacao, linha)
-        if codificacao == 'utf-8':
-            return linha
-        try:
-            return linha.decode(codificacao).encode('utf-8')
-        except:
-            return linha
-
     def analizar_arquivo(self, arquivo, codificacao='latin1'):
         try:
             while True:
                 linha = next(arquivo)
-                # linha = self.converter_linha(linha, codificacao)
                 res = self.analizar_linha(linha)
                 if res:
                     yield res

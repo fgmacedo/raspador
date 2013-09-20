@@ -85,6 +85,7 @@ Extract data from logs
 
 .. code-block:: python
 
+    from __future__ import print_function
     import json
     from raspador import Parser, StringField
 
@@ -95,7 +96,7 @@ Extract data from logs
     """
 
 
-    class ParserDeLog(Parser):
+    class LogParser(Parser):
         inicio = r'^PART.*'
         fim = r'^PART.*'
         PART = StringField(r'PART:([^\s]+)')
@@ -103,14 +104,15 @@ Extract data from logs
         TYPE = StringField(r'TYPE:([^\s]+)')
 
 
-    a = ParserDeLog()
+    a = LogParser()
 
-    # res é um gerador
-    res = a.analizar(linha for linha in out.splitlines())
+    # res is a generator
+    res = a.analizar(iter(out.splitlines()))
 
-    print (json.dumps(list(res), indent=2))
+    out_as_json = json.dumps(list(res), indent=2)
+    print (out_as_json)
 
-    # Saída:
+    # Output:
     """
     [
       {
