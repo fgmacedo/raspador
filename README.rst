@@ -2,7 +2,7 @@
 raspador
 ========
 
-.. image:: https://api.travis-ci.org/fgmacedo/raspador.png
+.. image:: https://api.travis-ci.org/fgmacedo/raspador.png?branch=master
         :target: https://travis-ci.org/fgmacedo/raspador
 
 .. image:: https://coveralls.io/repos/fgmacedo/raspador/badge.png
@@ -39,61 +39,49 @@ utilização de conceitos e recursos como iteradores, geradores, meta-programaç
 e property-descriptors.
 
 
-Compatibilidade e dependências
-===============================
+Compatibility and dependencies
+==============================
 
-O raspador é compatível com Python 2.6, 2.7, 3.2, 3.3 e pypy.
+raspador runs on Python 2.6+, 3.2+ and pypy.
 
-Desenvolvimento realizado em Python 2.7.5 e Python 3.2.3.
-
-Não há dependências externas.
+There are no external dependencies.
 
 .. note:: Python 2.6
 
-    Em Python 2.6, a biblioteca `ordereddict
-    <https://pypi.python.org/pypi/ordereddict/>`_ é necessária.
+    With Python 2.6, you must install `ordereddict
+    <https://pypi.python.org/pypi/ordereddict/>`_.
 
-    Você pode instalar com pip::
+    You can install it with pip::
 
         pip install ordereddict
 
-Testes
+Tests
 ======
 
-Os testes dependem de algumas bibliotecas externas:
+To automate tests with all supported Python versions at once, we use `tox
+<http://tox.readthedocs.org/en/latest/>`_.
+
+Run all tests with:
+
+.. code-block:: bash
+
+    $ tox
+
+Tests depends on several third party libraries, but these are installed by tox
+on each Python's virtualenv:
 
 .. code-block:: text
 
-    coverage==3.6
     nose==1.3.0
+    coverage==3.6
     flake8==2.0
-    invoke==0.5.0
 
 
-Você pode executar os testes com ``nosetests``:
-
-.. code-block:: bash
-
-    $ nosetests
-
-E adicionalmente, verificar a compatibilidade com o PEP8:
-
-.. code-block:: bash
-
-    $ flake8 raspador testes
-
-Ou por conveniência, executar os dois em sequência com invoke:
-
-.. code-block:: bash
-
-    $ invoke test
-
-
-Exemplos
+Examples
 ========
 
-Extrator de dados em logs
--------------------------
+Extract data from logs
+----------------------
 
 .. code-block:: python
 

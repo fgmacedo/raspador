@@ -69,13 +69,14 @@ class ParserMixin(object):
                 yield res
 
     def analizar_linha(self, linha):
-        logger.debug('analizar_linha: %s', linha)
+        logger.debug('analizar_linha: %s:%s', type(linha), linha)
         self.cache.adicionar(linha)
 
         if self.tem_busca_inicio and not self.inicio_encontrado:
             self.inicio_encontrado = bool(self._inicio.match(linha))
 
         if self.inicio_encontrado:
+            logger.debug('init found: %r', self.inicio_encontrado)
             if not self.tem_retorno:
                 self.retorno = self.default_item_class()
             if self.tem_busca_fim:
@@ -162,7 +163,7 @@ class ParserMetaclass(type):
     def adicionar_atributo_re(self, cls, atributos, nome):
         if nome in atributos:
             expressao = atributos[nome]
-            setattr(cls, '_' + nome, re.compile(expressao))
+            setattr(cls, '_' + nome, re.compile(expressao, re.UNICODE))
 
 
 Parser = ParserMetaclass('Parser', (object,), {})

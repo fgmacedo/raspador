@@ -156,7 +156,7 @@ class BaseField(object):
 
     @mascara.setter
     def mascara(self, valor):
-        self._mascara = re.compile(valor) if valor else None
+        self._mascara = re.compile(valor, re.UNICODE) if valor else None
 
     def anexar_na_classe(self, cls, name):
         self.cls = cls

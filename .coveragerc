@@ -1,6 +1,6 @@
 [run]
 include=*raspador*
-omit=tasks.py
+omit=tasks.py,*ordereddict*
 
 [report]
 exclude_lines =
