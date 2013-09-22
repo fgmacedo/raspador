@@ -3,7 +3,7 @@
 import unittest
 from datetime import date, datetime
 
-from raspador.campos import BaseField, StringField, FloatField, \
+from raspador.fields import BaseField, StringField, FloatField, \
     IntegerField, DateField, DateTimeField, BooleanField
 
 

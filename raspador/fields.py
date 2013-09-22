@@ -1,7 +1,7 @@
 #coding: utf-8
 
 """
-Os campos são simples extratores de dados baseados em expressões regulares.
+Os fields são simples extratores de dados baseados em expressões regulares.
 
 Ao confrontar uma linha recebida para análise com sua expressão regular, o
 campo verifica se há grupos de dados capturados, e então pode realizar algum
@@ -80,7 +80,7 @@ class BaseField(object):
 
     default
 
-        Valor que será utilizado no :py:class:`~raspador.analizador.Parser`
+        Valor que será utilizado no :py:class:`~raspador.parser.Parser`
         , quando o campo não retornar valor após a análise das
         linhas recebidas.
 
@@ -95,7 +95,7 @@ class BaseField(object):
             ['022734']
 
         Por convenção, quando um campo retorna uma lista, o
-        :py:class:`~raspador.analizador.Parser` acumula os valores
+        :py:class:`~raspador.parser.Parser` acumula os valores
         retornados pelo campo.
     """
     def __init__(self, mascara=None, **kwargs):
@@ -122,12 +122,12 @@ class BaseField(object):
         "Ponto para inicialização especial nas classes descendentes"
         pass
 
-    def atribuir_analizador(self, analizador):
+    def atribuir_analizador(self, parser):
         """
         Recebe uma referência fraca de
-        :py:class:`~raspador.analizador.Parser`
+        :py:class:`~raspador.parser.Parser`
         """
-        self.analizador = analizador
+        self.parser = parser
 
     def _resultado_valido(self, valor):
         return bool(valor)

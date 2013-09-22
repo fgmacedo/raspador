@@ -10,22 +10,22 @@ arquivos texto semi-estruturados.
 Parser
 ----------
 
-.. automodule:: raspador.analizador
+.. automodule:: raspador.parser
     :members:
 
 
 Campos
 ------
 
-.. automodule:: raspador.campos
+.. automodule:: raspador.fields
     :members:
     :undoc-members:
 
 
-Coleções
---------
+Item
+----
 
-.. automodule:: raspador.colecoes
+.. automodule:: raspador.item
     :members:
     :undoc-members:
 

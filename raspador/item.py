@@ -6,7 +6,7 @@ except:
     from ordereddict import OrderedDict
 
 
-class Dicionario(OrderedDict):
+class Dictionary(OrderedDict):
     """
     Dicionário especializado que permite acesso de chaves como propriedades.
     Adicionalmente, se uma chave já foi atribuída, transforma o valor em uma

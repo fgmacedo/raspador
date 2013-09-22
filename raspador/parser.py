@@ -1,11 +1,11 @@
 #coding: utf-8
 import re
 import weakref
-
-from .cache import Cache
-from .colecoes import Dicionario
 import collections
 import logging
+
+from .cache import Cache
+from .item import Dictionary
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class ParserMixin(object):
     """
 
     qtd_linhas_cache = 0
-    default_item_class = Dicionario
+    default_item_class = Dictionary
 
     def __init__(self):
         self.tem_busca_inicio = hasattr(self, '_inicio')
@@ -29,9 +29,9 @@ class ParserMixin(object):
 
     def _atribuir_analizador_nos_campos(self):
         """
-        Atribui uma referência fraca do analizador para seus campos.
+        Atribui uma referência fraca do parser para seus fields.
         Não foi utilizada referência forte para não gerar dependência ciclica,
-            impedindo a liberação de memória do analizador.
+            impedindo a liberação de memória do parser.
         """
         ref = weakref.ref(self)
         for item in list(self._campos.values()):

@@ -8,8 +8,8 @@ import re
 
 sys.path.append('../')
 
-from raspador.analizador import Parser, Dicionario
-from raspador.campos import BaseField, FloatField, \
+from raspador.parser import Parser, Dictionary
+from raspador.fields import BaseField, FloatField, \
     IntegerField, BooleanField
 
 
@@ -46,7 +46,7 @@ class DictDiffer(object):
                    if self.past_dict[o] == self.current_dict[o])
 
 
-def assertDicionario(self, a, b, mensagem=''):
+def assertDictionary(self, a, b, mensagem=''):
     d = DictDiffer(a, b)
 
     def diff(msg, fn):
@@ -68,7 +68,7 @@ class CampoItem(BaseField):
                         "\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)")
 
     def to_python(self, r):
-        return Dicionario(
+        return Dictionary(
             Item=int(r[0]),
             Codigo=r[1],
             Descricao=r[2],
@@ -96,7 +96,7 @@ class TotalizadoresNaoFiscais(Parser):
             self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
 
         def to_python(self, v):
-            return Dicionario(
+            return Dictionary(
                 N=int(v[0]),
                 Operacao=v[1].strip(),
                 CON=int(v[2]),
@@ -126,11 +126,11 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
     cache_itens = None
 
     def setUp(self):
-        self.analizador = self.criar_analizador()
+        self.parser = self.criar_analizador()
         self.arquivo = self.obter_arquivo()
 
-        # verificando se analizador foi criado
-        self.assertTrue(hasattr(self.analizador, 'analizar'))
+        # verificando se parser foi criado
+        self.assertTrue(hasattr(self.parser, 'analizar'))
 
         if self.cache_itens:
             self.itens = self.cache_itens
@@ -158,7 +158,7 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
         raise NotImplementedError('Return an file-like object')
 
     def analizar(self):
-        return list(self.analizador.analizar(
+        return list(self.parser.analizar(
             self.arquivo,
             codificacao=self.codificacao_arquivo) or [])
 
@@ -166,7 +166,7 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
     def open_file(cls, filename):
         return codecs.open(full_path(filename), encoding=cls.codificacao_arquivo)
 
-    assertDicionario = assertDicionario
+    assertDictionary = assertDictionary
 
 
 class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
@@ -344,7 +344,7 @@ class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
                 ]
             }
         ]
-        self.assertDicionario(reducao[0], self.itens[0])
+        self.assertDictionary(reducao[0], self.itens[0])
 
 if __name__ == '__main__':
     import logging
