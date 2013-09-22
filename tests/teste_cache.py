@@ -12,7 +12,7 @@ class Test_Cache(unittest.TestCase):
         self.cache.adicionar(2)
         self.cache.adicionar(3)
         self.cache.adicionar(4)
-        self.assertEqual(self.cache.itens(), [2, 3, 4])
+        self.assertEqual(list(self.cache.itens()), [2, 3, 4])
 
     def test_deve_consumir_cache(self):
         self.cache.adicionar(1)

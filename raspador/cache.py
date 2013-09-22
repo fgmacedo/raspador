@@ -1,10 +1,11 @@
 #coding: utf-8
+from collections import deque
 
 
 class Cache(object):
     def __init__(self, tamanho=0):
         self.tamanho = tamanho
-        self.lista = []
+        self.lista = deque()
 
     def __len__(self):
         return len(self.lista)
@@ -13,11 +14,11 @@ class Cache(object):
         self.lista.append(item)
         if self.tamanho:
             while len(self.lista) > self.tamanho:
-                self.lista.pop(0)
+                self.lista.popleft()
 
     def itens(self):
         return self.lista
 
     def consumir(self):
         while self.lista:
-            yield self.lista.pop(0)
+            yield self.lista.popleft()
