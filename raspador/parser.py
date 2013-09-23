@@ -17,40 +17,38 @@ class ParserMixin(object):
     Padrão mix-in.
     """
 
-    qtd_linhas_cache = 0
+    number_of_blocks_in_cache = 0
     default_item_class = Dictionary
 
     def __init__(self):
         self.tem_busca_inicio = hasattr(self, '_inicio')
         self.tem_busca_fim = hasattr(self, '_fim')
         self.inicio_encontrado = not self.tem_busca_inicio
-        self.cache = Cache(self.qtd_linhas_cache + 1)
-        self._atribuir_analizador_nos_campos()
+        self.cache = Cache(self.number_of_blocks_in_cache + 1)
+        self._assign_parser_on_fields()
 
-    def _atribuir_analizador_nos_campos(self):
+    def _assign_parser_on_fields(self):
         """
-        Atribui uma referência fraca do parser para seus fields.
-        Não foi utilizada referência forte para não gerar dependência ciclica,
-            impedindo a liberação de memória do parser.
+        Assigns an weak parser reference to fields.
         """
         ref = weakref.ref(self)
         for item in list(self._campos.values()):
-            if hasattr(item, 'atribuir_analizador'):
-                item.atribuir_analizador(ref)
+            if hasattr(item, 'assign_parser'):
+                item.assign_parser(ref)
 
-    def analizar(self, arquivo, codificacao='latin1'):
-        for item in self.analizar_arquivo(arquivo, codificacao):
+    def parse(self, iterator):
+        for item in self.parse_iterator(iterator):
             yield item
 
     @property
     def tem_retorno(self):
         return hasattr(self, 'retorno') and self.retorno is not None
 
-    def analizar_arquivo(self, arquivo, codificacao='latin1'):
+    def parse_iterator(self, iterator):
         try:
             while True:
-                linha = next(arquivo)
-                res = self.analizar_linha(linha)
+                block = next(iterator)
+                res = self.parse_block(block)
                 if res:
                     yield res
         except StopIteration:
@@ -58,26 +56,26 @@ class ParserMixin(object):
             if res:
                 yield res
 
-    def analizar_linha(self, linha):
-        logger.debug('analizar_linha: %s:%s', type(linha), linha)
-        self.cache.adicionar(linha)
+    def parse_block(self, block):
+        logger.debug('parse_block: %s:%s', type(block), block)
+        self.cache.adicionar(block)
 
         if self.tem_busca_inicio and not self.inicio_encontrado:
-            self.inicio_encontrado = bool(self._inicio.match(linha))
+            self.inicio_encontrado = bool(self._inicio.match(block))
 
         if self.inicio_encontrado:
             logger.debug('init found: %r', self.inicio_encontrado)
             if not self.tem_retorno:
                 self.retorno = self.default_item_class()
             if self.tem_busca_fim:
-                self.inicio_encontrado = not bool(self._fim.match(linha))
+                self.inicio_encontrado = not bool(self._fim.match(block))
 
-            for linha in self.cache.consumir():
+            for block in self.cache.consumir():
                 for nome, campo in list(self._campos.items()):
                     if nome in self.retorno and \
                             hasattr(campo, 'lista') and not campo.lista:
                         continue
-                    valor = campo.analizar_linha(linha)
+                    valor = campo.parse_block(block)
                     if valor is not None:
                         self.atribuir_valor_ao_retorno(nome, valor)
                         if self.retornar_ao_obter_valor:
@@ -137,7 +135,7 @@ class ParserMetaclass(type):
         super(ParserMetaclass, cls).__init__(name, bases, attrs)
 
         cls._campos = dict((k, v) for k, v in list(attrs.items())
-                           if hasattr(v, 'analizar_linha')
+                           if hasattr(v, 'parse_block')
                            and not isinstance(v, type))
 
         cls.adicionar_atributo_re(cls, attrs, 'inicio')

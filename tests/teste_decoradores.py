@@ -11,7 +11,7 @@ class CampoFake(object):
         self.linhas = []
         self.retornar = retornar
 
-    def analizar_linha(self, linha):
+    def parse_block(self, linha):
         self.linhas.append(linha)
         if self.retornar:
             return linha
@@ -42,8 +42,8 @@ class TesteDeProxyChamandoMetodosSemIntervencao(unittest.TestCase):
     def teste_decorador_deve_passar_linhas(self):
         mock = CampoFake()
         p = ProxyDeCampo(mock)
-        p.analizar_linha('teste1')
-        p.analizar_linha('teste2')
+        p.parse_block('teste1')
+        p.parse_block('teste2')
         self.assertEqual(
             mock.linhas,
             ['teste1', 'teste2']
@@ -55,12 +55,12 @@ class TesteDeDecoradorConcatenaAteRE(unittest.TestCase):
     def teste_deve_chamar_decorado_acumulando_linhas(self):
         mock = CampoFake()
         p = ProxyConcatenaAteRE(mock, ' '.join, 'l4|l6')
-        p.analizar_linha('l1')
-        p.analizar_linha('l2')
-        p.analizar_linha('l3')
-        p.analizar_linha('l4')
-        p.analizar_linha('l5')
-        p.analizar_linha('l6')
+        p.parse_block('l1')
+        p.parse_block('l2')
+        p.parse_block('l3')
+        p.parse_block('l4')
+        p.parse_block('l5')
+        p.parse_block('l6')
         self.assertEqual(
             [
                 'l1 l2 l3 l4',
@@ -72,12 +72,12 @@ class TesteDeDecoradorConcatenaAteRE(unittest.TestCase):
     def teste_deve_chamar_decorado_retornando_primeiro_valor(self):
         mock = CampoFake(retornar=True)
         p = ProxyConcatenaAteRE(mock, ' '.join, 'l\d')
-        p.analizar_linha('l1')
-        p.analizar_linha('l2')
-        p.analizar_linha('l3')
-        p.analizar_linha('l4')
-        p.analizar_linha('l5')
-        p.analizar_linha('l6')
+        p.parse_block('l1')
+        p.parse_block('l2')
+        p.parse_block('l3')
+        p.parse_block('l4')
+        p.parse_block('l5')
+        p.parse_block('l6')
         self.assertEqual(
             [
                 'l1',

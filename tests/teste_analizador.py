@@ -83,7 +83,7 @@ class CampoItem(BaseField):
 class ExtratorDeDados(Parser):
     inicio = r'^\s+CUPOM FISCAL\s+$'
     fim = r'^FAB:.*BR$'
-    qtd_linhas_cache = 1
+    number_of_blocks_in_cache = 1
     COO = IntegerField(r'COO:\s?(\d+)')
     Cancelado = BooleanField(r'^\s+(CANCELAMENTO)\s+$')
     Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
@@ -114,7 +114,7 @@ class TotalizadoresNaoFiscais(Parser):
 class ParserDeReducaoZ(Parser):
     inicio = r'^\s+REDUÇÃO Z\s+$'
     fim = r'^FAB:.*BR$'
-    qtd_linhas_cache = 1
+    number_of_blocks_in_cache = 1
     COO = IntegerField(r'COO:\s*(\d+)')
     CRZ = IntegerField(r'Contador de Redução Z:\s*(\d+)')
     Totalizadores = TotalizadoresNaoFiscais()
@@ -130,7 +130,7 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
         self.arquivo = self.obter_arquivo()
 
         # verificando se parser foi criado
-        self.assertTrue(hasattr(self.parser, 'analizar'))
+        self.assertTrue(hasattr(self.parser, 'parse'))
 
         if self.cache_itens:
             self.itens = self.cache_itens
@@ -158,9 +158,7 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
         raise NotImplementedError('Return an file-like object')
 
     def analizar(self):
-        return list(self.parser.analizar(
-            self.arquivo,
-            codificacao=self.codificacao_arquivo) or [])
+        return list(self.parser.parse(self.arquivo) or [])
 
     @classmethod
     def open_file(cls, filename):

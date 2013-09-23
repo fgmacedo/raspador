@@ -23,10 +23,10 @@ class ProxyConcatenaAteRE(ProxyDeCampo):
         self.uniao = uniao
         self.re_fim = re.compile(re_fim)
 
-    def analizar_linha(self, linha):
+    def parse_block(self, linha):
         linha = linha.rstrip()
         self.cache.append(linha)
         if self.re_fim.match(linha):
             acumulado = self.uniao(self.cache)
             self.cache = []
-            return self.campo.analizar_linha(acumulado)
+            return self.campo.parse_block(acumulado)

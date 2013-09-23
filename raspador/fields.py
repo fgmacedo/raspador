@@ -28,7 +28,7 @@ class BaseField(object):
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> campo = BaseField(mascara=r'COO:(\d+)')
-            >>> campo.analizar_linha(s)
+            >>> campo.parse_block(s)
             '022734'
 
         O parâmetro mascara é o único posicional, e deste modo, seu nome pode
@@ -36,7 +36,7 @@ class BaseField(object):
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> campo = BaseField(r'COO:(\d+)')
-            >>> campo.analizar_linha(s)
+            >>> campo.parse_block(s)
             '022734'
 
 
@@ -50,7 +50,7 @@ class BaseField(object):
             ...     return int(valor) * 2
             ...
             >>> campo = BaseField(r'COO:(\d+)', ao_atribuir=dobro)
-            >>> campo.analizar_linha(s)  # 45468 = 2 x 22734
+            >>> campo.parse_block(s)  # 45468 = 2 x 22734
             45468
 
     grupos
@@ -66,7 +66,7 @@ class BaseField(object):
             >>> s = "Contador de Reduções Z:                     1246"
             >>> campo = BaseField(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
                 grupos=1, ao_atribuir=int)
-            >>> campo.analizar_linha(s)
+            >>> campo.parse_block(s)
             1246
 
         Ou uma lista de inteiros::
@@ -74,7 +74,7 @@ class BaseField(object):
             >>> s = "Data do movimento: 02/01/2013 10:21:51"
             >>> c = BaseField(r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)',\
                 grupos=[1, 2, 3])
-            >>> c.analizar_linha(s)
+            >>> c.parse_block(s)
             ['02', '01', '2013']
 
 
@@ -91,7 +91,7 @@ class BaseField(object):
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
             >>> campo = BaseField(r'COO:(\d+)', lista=True)
-            >>> campo.analizar_linha(s)
+            >>> campo.parse_block(s)
             ['022734']
 
         Por convenção, quando um campo retorna uma lista, o
@@ -122,7 +122,7 @@ class BaseField(object):
         "Ponto para inicialização especial nas classes descendentes"
         pass
 
-    def atribuir_analizador(self, parser):
+    def assign_parser(self, parser):
         """
         Recebe uma referência fraca de
         :py:class:`~raspador.parser.Parser`
@@ -161,7 +161,7 @@ class BaseField(object):
     def anexar_na_classe(self, cls, name):
         self.cls = cls
 
-    def analizar_linha(self, linha):
+    def parse_block(self, linha):
         if self.mascara:
             valor = self._metodo_busca(linha)
             if self._resultado_valido(valor):
