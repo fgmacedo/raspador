@@ -97,8 +97,8 @@ Extract data from logs
 
 
     class LogParser(Parser):
-        inicio = r'^PART.*'
-        fim = r'^PART.*'
+        begin = r'^PART.*'
+        end = r'^PART.*'
         PART = StringField(r'PART:([^\s]+)')
         UUID = StringField(r'UUID:([^\s]+)')
         TYPE = StringField(r'TYPE:([^\s]+)')

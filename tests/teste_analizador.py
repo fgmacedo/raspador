@@ -81,8 +81,8 @@ class CampoItem(BaseField):
 
 
 class ExtratorDeDados(Parser):
-    inicio = r'^\s+CUPOM FISCAL\s+$'
-    fim = r'^FAB:.*BR$'
+    begin = r'^\s+CUPOM FISCAL\s+$'
+    end = r'^FAB:.*BR$'
     number_of_blocks_in_cache = 1
     COO = IntegerField(r'COO:\s?(\d+)')
     Cancelado = BooleanField(r'^\s+(CANCELAMENTO)\s+$')
@@ -103,8 +103,8 @@ class TotalizadoresNaoFiscais(Parser):
                 ValorAcumulado=float(re.sub('[,.]', '.', v[3])),
             )
 
-    inicio = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
-    fim = r'^[\s-]*$'
+    begin = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
+    end = r'^[\s-]*$'
     Totalizador = CampoNF(lista=True)
 
     def processar_retorno(self):
@@ -112,8 +112,8 @@ class TotalizadoresNaoFiscais(Parser):
 
 
 class ParserDeReducaoZ(Parser):
-    inicio = r'^\s+REDUÇÃO Z\s+$'
-    fim = r'^FAB:.*BR$'
+    begin = r'^\s+REDUÇÃO Z\s+$'
+    end = r'^FAB:.*BR$'
     number_of_blocks_in_cache = 1
     COO = IntegerField(r'COO:\s*(\d+)')
     CRZ = IntegerField(r'Contador de Redução Z:\s*(\d+)')
@@ -162,7 +162,8 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
 
     @classmethod
     def open_file(cls, filename):
-        return codecs.open(full_path(filename), encoding=cls.codificacao_arquivo)
+        return codecs.open(full_path(filename),
+                           encoding=cls.codificacao_arquivo)
 
     assertDictionary = assertDictionary
 
@@ -296,8 +297,8 @@ class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
 
     def criar_analizador(self):
         class ExtratorDeDados(Parser):
-            inicio = r'^\s+CUPOM FISCAL\s+$'
-            fim = r'^FAB:.*BR$'
+            begin = r'^\s+CUPOM FISCAL\s+$'
+            end = r'^FAB:.*BR$'
             Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
 
         return ExtratorDeDados()
