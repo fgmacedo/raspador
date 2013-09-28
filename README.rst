@@ -20,7 +20,7 @@ Biblioteca para extração de dados em documentos semi-estruturados.
 A definição dos extratores é feita através de classes como modelos, de forma
 semelhante ao ORM do Django. Cada extrator procura por um padrão especificado
 por expressão regular, e a conversão para tipos primitidos é feita
-automaticamente a partir dos grupos capturados.
+automaticamente a partir dos groups capturados.
 
 
 O analisador é implementado como um gerador, onde cada item encontrado pode ser

@@ -9,8 +9,8 @@ import re
 sys.path.append('../')
 
 from raspador.parser import Parser, Dictionary
-from raspador.fields import BaseField, FloatField, \
-    IntegerField, BooleanField
+from raspador.fields import BaseField, IntegerField, BooleanField
+from raspador.fields import BRFloatField as FloatField
 
 
 full_path = lambda x: os.path.join(os.path.dirname(__file__), x)
@@ -63,8 +63,8 @@ def assertDictionary(self, a, b, mensagem=''):
 
 
 class CampoItem(BaseField):
-    def _iniciar(self):
-        self.mascara = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
+    def _setup(self):
+        self.search = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
                         "\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)")
 
     def to_python(self, r):
@@ -92,8 +92,8 @@ class ExtratorDeDados(Parser):
 
 class TotalizadoresNaoFiscais(Parser):
     class CampoNF(BaseField):
-        def _iniciar(self):
-            self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
+        def _setup(self):
+            self.search = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
 
         def to_python(self, v):
             return Dictionary(
