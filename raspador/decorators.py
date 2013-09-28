@@ -2,31 +2,30 @@
 import re
 
 
-class ProxyDeCampo(object):
-    def __init__(self, campo):
-        self.campo = campo
+class FieldProxy(object):
+    def __init__(self, field):
+        self.field = field
 
-    def __getattr__(self, atributo):
-        return getattr(self.campo, atributo)
+    def __getattr__(self, attr):
+        return getattr(self.field, attr)
 
 
-class ProxyConcatenaAteRE(ProxyDeCampo):
+class UnionUntilRegexProxy(FieldProxy):
     """
-    Proxy que faz cache de linhas recebidas. Quando recebe uma linha para
-    análise, envia a linha ao cache, até encontrar um match da linha recebida
-    com a expressão regular de término, e então envia o acumulado das linhas
-    recebidas para o decorado.
+    Does cache of blocks until the provided regex returns a match, then uses
+    the ``union_method`` to join blocks that are sent to the decorated field.
     """
-    def __init__(self, campo, uniao, re_fim):
-        super(ProxyConcatenaAteRE, self).__init__(campo)
+    def __init__(self, field, union_method, search_regex):
+        super(UnionUntilRegexProxy, self).__init__(field)
         self.cache = []
-        self.uniao = uniao
-        self.re_fim = re.compile(re_fim)
+        self.union_method = union_method
+        self.search_regex = re.compile(search_regex, re.UNICODE)
 
-    def parse_block(self, linha):
-        linha = linha.rstrip()
-        self.cache.append(linha)
-        if self.re_fim.match(linha):
-            acumulado = self.uniao(self.cache)
+    def parse_block(self, block):
+        if hasattr(block, 'rstrip'):
+            block = block.rstrip()
+        self.cache.append(block)
+        if self.search_regex.match(block):
+            blocks = self.union_method(self.cache)
             self.cache = []
-            return self.campo.parse_block(acumulado)
+            return self.field.parse_block(blocks)

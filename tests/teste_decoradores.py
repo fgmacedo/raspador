@@ -1,7 +1,7 @@
 #coding: utf-8
 import unittest
 
-from raspador import ProxyDeCampo, ProxyConcatenaAteRE
+from raspador import FieldProxy, UnionUntilRegexProxy
 
 
 class CampoFake(object):
@@ -25,7 +25,7 @@ class CampoFake(object):
 class TesteDeProxyChamandoMetodosSemIntervencao(unittest.TestCase):
     def teste_decorador_deve_retornar_default(self):
         mock = CampoFake(default=1234)
-        p = ProxyDeCampo(mock)
+        p = FieldProxy(mock)
         self.assertEqual(
             p.default,
             1234
@@ -33,7 +33,7 @@ class TesteDeProxyChamandoMetodosSemIntervencao(unittest.TestCase):
 
     def teste_decorador_deve_retornar_valor_lista(self):
         mock = CampoFake(is_list=True)
-        p = ProxyDeCampo(mock)
+        p = FieldProxy(mock)
         self.assertEqual(
             p.is_list,
             True
@@ -41,7 +41,7 @@ class TesteDeProxyChamandoMetodosSemIntervencao(unittest.TestCase):
 
     def teste_decorador_deve_passar_linhas(self):
         mock = CampoFake()
-        p = ProxyDeCampo(mock)
+        p = FieldProxy(mock)
         p.parse_block('teste1')
         p.parse_block('teste2')
         self.assertEqual(
@@ -54,7 +54,7 @@ class TesteDeDecoradorConcatenaAteRE(unittest.TestCase):
 
     def teste_deve_chamar_decorado_acumulando_linhas(self):
         mock = CampoFake()
-        p = ProxyConcatenaAteRE(mock, ' '.join, 'l4|l6')
+        p = UnionUntilRegexProxy(mock, ' '.join, 'l4|l6')
         p.parse_block('l1')
         p.parse_block('l2')
         p.parse_block('l3')
@@ -71,7 +71,7 @@ class TesteDeDecoradorConcatenaAteRE(unittest.TestCase):
 
     def teste_deve_chamar_decorado_retornando_primeiro_valor(self):
         mock = CampoFake(retornar=True)
-        p = ProxyConcatenaAteRE(mock, ' '.join, 'l\d')
+        p = UnionUntilRegexProxy(mock, ' '.join, 'l\d')
         p.parse_block('l1')
         p.parse_block('l2')
         p.parse_block('l3')

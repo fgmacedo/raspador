@@ -3,8 +3,8 @@ from collections import deque
 
 
 class Cache(object):
-    def __init__(self, length=0):
-        self.length = length
+    def __init__(self, max_length=0):
+        self.max_length = max_length
         self.items = deque()
 
     def __len__(self):
@@ -12,8 +12,8 @@ class Cache(object):
 
     def append(self, item):
         self.items.append(item)
-        if self.length:
-            while len(self.items) > self.length:
+        if self.max_length:
+            while len(self.items) > self.max_length:
                 self.items.popleft()
 
     def itens(self):

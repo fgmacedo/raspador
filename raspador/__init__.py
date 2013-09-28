@@ -5,6 +5,6 @@ from .item import Dictionary
 from .fields import BaseField, StringField, FloatField, \
     IntegerField, DateField, DateTimeField, BooleanField
 
-from .decorators import ProxyDeCampo, ProxyConcatenaAteRE
+from .decorators import FieldProxy, UnionUntilRegexProxy
 
 from .cache import Cache

@@ -107,7 +107,7 @@ Extract data from logs
     a = LogParser()
 
     # res is a generator
-    res = a.analizar(iter(out.splitlines()))
+    res = a.parse(iter(out.splitlines()))
 
     out_as_json = json.dumps(list(res), indent=2)
     print (out_as_json)
