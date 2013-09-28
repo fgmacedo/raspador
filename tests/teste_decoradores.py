@@ -5,9 +5,9 @@ from raspador import ProxyDeCampo, ProxyConcatenaAteRE
 
 
 class CampoFake(object):
-    def __init__(self, default=None, lista=False, retornar=False):
+    def __init__(self, default=None, is_list=False, retornar=False):
         self.default = default
-        self.lista = lista
+        self.is_list = is_list
         self.linhas = []
         self.retornar = retornar
 
@@ -16,7 +16,7 @@ class CampoFake(object):
         if self.retornar:
             return linha
 
-    def anexar_na_classe(self, cls, nome, informacoes):
+    def assign_class(self, cls, nome, informacoes):
         self.classe = cls
         self.nome = nome
         self.informacoes = informacoes
@@ -32,10 +32,10 @@ class TesteDeProxyChamandoMetodosSemIntervencao(unittest.TestCase):
         )
 
     def teste_decorador_deve_retornar_valor_lista(self):
-        mock = CampoFake(lista=True)
+        mock = CampoFake(is_list=True)
         p = ProxyDeCampo(mock)
         self.assertEqual(
-            p.lista,
+            p.is_list,
             True
         )
 

@@ -87,7 +87,7 @@ class ExtratorDeDados(Parser):
     COO = IntegerField(r'COO:\s?(\d+)')
     Cancelado = BooleanField(r'^\s+(CANCELAMENTO)\s+$')
     Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
-    Itens = CampoItem(lista=True)
+    Itens = CampoItem(is_list=True)
 
 
 class TotalizadoresNaoFiscais(Parser):
@@ -105,10 +105,10 @@ class TotalizadoresNaoFiscais(Parser):
 
     begin = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
     end = r'^[\s-]*$'
-    Totalizador = CampoNF(lista=True)
+    Totalizador = CampoNF(is_list=True)
 
-    def processar_retorno(self):
-        self.retorno = self.retorno.Totalizador
+    def process_item(self):
+        self.item = self.item.Totalizador
 
 
 class ParserDeReducaoZ(Parser):
@@ -172,7 +172,7 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
     codificacao_arquivo = 'utf-8'
 
     def obter_arquivo(self):
-        return open(full_path('arquivos/cupom.txt'))
+        return self.open_file('arquivos/cupom.txt')
 
     def criar_analizador(self):
         return ExtratorDeDados()
@@ -293,7 +293,7 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
 
 class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
     def obter_arquivo(self):
-        return open(full_path('arquivos/cupom.txt'))
+        return self.open_file('arquivos/cupom.txt')
 
     def criar_analizador(self):
         class ExtratorDeDados(Parser):
@@ -313,7 +313,6 @@ class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
     def obter_arquivo(self):
         "sobrescrever retornando arquivo"
         return self.open_file('arquivos/reducaoz.txt')
-        # return open(full_path('arquivos/reducaoz.txt'), encoding=self.codificacao_arquivo)
 
     def criar_analizador(self):
         return ParserDeReducaoZ()
@@ -348,7 +347,7 @@ class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
 if __name__ == '__main__':
     import logging
     logging.basicConfig(
-        filename='example.log',
+        # filename='test_parser.log',
         level=logging.DEBUG,
         format='%(asctime)-15s %(message)s'
     )

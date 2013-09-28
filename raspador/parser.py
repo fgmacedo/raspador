@@ -1,4 +1,5 @@
 #coding: utf-8
+# from __future__ import unicode_literals
 import re
 import weakref
 import collections
@@ -17,15 +18,16 @@ class ParserMixin(object):
 
     number_of_blocks_in_cache = 0
     default_item_class = Dictionary
+    yield_item_to_each_field_value_found = False
+    begin = None
+    end = None
 
     def __init__(self):
-        self.has_search_begin = hasattr(self, '_begin')
-        self.has_search_end = hasattr(self, '_end')
         self.begin_found = not self.has_search_begin
         self.cache = Cache(self.number_of_blocks_in_cache + 1)
-        self._assign_parser_on_fields()
+        self._assign_parser_to_fields()
 
-    def _assign_parser_on_fields(self):
+    def _assign_parser_to_fields(self):
         """
         Assigns an weak parser reference to fields.
         """
@@ -39,8 +41,8 @@ class ParserMixin(object):
             yield item
 
     @property
-    def tem_retorno(self):
-        return hasattr(self, 'retorno') and self.retorno is not None
+    def has_item(self):
+        return hasattr(self, 'item') and self.item is not None
 
     def parse_iterator(self, iterator):
         try:
@@ -50,71 +52,71 @@ class ParserMixin(object):
                 if res:
                     yield res
         except StopIteration:
-            res = self.finalizar()
+            res = self.finalize()
             if res:
                 yield res
 
     def parse_block(self, block):
-        logger.debug('parse_block: %s:%s', type(block), block)
-        self.cache.adicionar(block)
+        logger.debug('parse_block: %r:%s', type(block), block)
+        self.cache.append(block)
 
         if self.has_search_begin and not self.begin_found:
             self.begin_found = bool(self._begin.match(block))
 
         if self.begin_found:
             logger.debug('init found: %r', self.begin_found)
-            if not self.tem_retorno:
-                self.retorno = self.default_item_class()
+            if not self.has_item:
+                self.item = self.default_item_class()
             if self.has_search_end:
                 self.begin_found = not bool(self._end.match(block))
 
-            for block in self.cache.consumir():
+            for block in self.cache.consume():
                 for name, field in list(self.fields.items()):
-                    if name in self.retorno and \
-                            hasattr(field, 'lista') and not field.lista:
+                    if name in self.item and \
+                            hasattr(field, 'is_list') and not field.is_list:
                         continue
                     value = field.parse_block(block)
                     if value is not None:
-                        self.atribuir_valor_ao_retorno(name, value)
-                        if self.retornar_ao_obter_valor:
-                            return self.finalizar_retorno()
+                        self.assign_value_into_item(name, value)
+                        if self.yield_item_to_each_field_value_found:
+                            return self.finalize_item()
 
             if not self.begin_found:
-                return self.finalizar_retorno()
+                return self.finalize_item()
 
-    def finalizar(self):
-        if not self.tem_retorno:
+    def finalize(self):
+        if not self.has_item:
             return None
-        if self.retornar_ao_obter_valor:
+        if self.yield_item_to_each_field_value_found:
             return None
-        return self.finalizar_retorno()
+        return self.finalize_item()
 
-    def finalizar_retorno(self):
+    def finalize_item(self):
         for name, field in list(self.fields.items()):
-            if not name in self.retorno:
+            if not name in self.item:
                 value = None
-                if hasattr(field, 'finalizar') and \
-                        isinstance(field.finalizar, collections.Callable):
-                    value = field.finalizar()
+                if hasattr(field, 'finalize') and \
+                        isinstance(field.finalize, collections.Callable):
+                    value = field.finalize()
                 if value is None:
                     value = field.default
                 if value is not None:
-                    self.atribuir_valor_ao_retorno(name, value)
+                    self.assign_value_into_item(name, value)
 
-        self.processar_retorno()
-        res = self.retorno
-        self.retorno = None
+        self.process_item()
+        res = self.item
+        self.item = None
         return res
 
-    def atribuir_valor_ao_retorno(self, name, value):
-        if isinstance(value, list) and not name in self.retorno:
-            self.retorno[name] = value
-        elif isinstance(value, list) and hasattr(self.retorno[name], 'extend'):
-            self.retorno[name].extend(value)
+    def assign_value_into_item(self, name, value):
+        if isinstance(value, list) and not name in self.item:
+            self.item[name] = value
+        elif isinstance(value, list) and hasattr(self.item[name], 'extend'):
+            self.item[name].extend(value)
         else:
-            self.retorno[name] = value
+            self.item[name] = value
 
-    def processar_retorno(self):
+    def process_item(self):
         "Allows final modifications at the object being returned"
         pass
 
@@ -136,20 +138,20 @@ class ParserMetaclass(type):
                           if hasattr(v, 'parse_block')
                           and not isinstance(v, type))
 
-        cls.adicionar_atributo_re(cls, attrs, 'begin')
-        cls.adicionar_atributo_re(cls, attrs, 'end')
+        cls.add_regex_attr(cls, attrs, 'begin')
+        cls.add_regex_attr(cls, attrs, 'end')
 
-        if not hasattr(cls, 'retornar_ao_obter_valor'):
-            cls.retornar_ao_obter_valor = False
+        for name, attr in list(cls.fields.items()):
+            if hasattr(attr, 'assign_class'):
+                attr.assign_class(cls, name)
 
-        for name, atributo in list(cls.fields.items()):
-            if hasattr(atributo, 'anexar_na_classe'):
-                atributo.anexar_na_classe(cls, name)
-
-    def adicionar_atributo_re(self, cls, atributos, name):
-        if name in atributos:
-            expressao = atributos[name]
-            setattr(cls, '_' + name, re.compile(expressao, re.UNICODE))
+    def add_regex_attr(self, cls, attrs, name):
+        has_attr = name in attrs
+        setattr(cls, 'has_search_'+name, has_attr)
+        if has_attr:
+            regex = attrs[name]
+            logger.error('add_regex_attr %s: %s', name, regex)
+            setattr(cls, '_' + name, re.compile(regex, re.UNICODE))
 
 
 Parser = ParserMetaclass('Parser', (object,), {})

@@ -3,22 +3,22 @@ from collections import deque
 
 
 class Cache(object):
-    def __init__(self, tamanho=0):
-        self.tamanho = tamanho
-        self.lista = deque()
+    def __init__(self, length=0):
+        self.length = length
+        self.items = deque()
 
     def __len__(self):
-        return len(self.lista)
+        return len(self.items)
 
-    def adicionar(self, item):
-        self.lista.append(item)
-        if self.tamanho:
-            while len(self.lista) > self.tamanho:
-                self.lista.popleft()
+    def append(self, item):
+        self.items.append(item)
+        if self.length:
+            while len(self.items) > self.length:
+                self.items.popleft()
 
     def itens(self):
-        return self.lista
+        return self.items
 
-    def consumir(self):
-        while self.lista:
-            yield self.lista.popleft()
+    def consume(self):
+        while self.items:
+            yield self.items.popleft()

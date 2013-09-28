@@ -85,12 +85,12 @@ class BaseField(object):
         linhas recebidas.
 
 
-    lista
+    is_list
 
         Quando especificado, retorna o valor como uma lista::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = BaseField(r'COO:(\d+)', lista=True)
+            >>> campo = BaseField(r'COO:(\d+)', is_list=True)
             >>> campo.parse_block(s)
             ['022734']
 
@@ -100,7 +100,7 @@ class BaseField(object):
     """
     def __init__(self, mascara=None, **kwargs):
         self.default = kwargs.get('default')
-        self.lista = kwargs.get('lista', False)
+        self.is_list = kwargs.get('is_list', False)
         self.mascara = mascara
         self.ao_atribuir = kwargs.get('ao_atribuir')
         self.grupos = kwargs.get('grupos', [])
@@ -158,7 +158,7 @@ class BaseField(object):
     def mascara(self, valor):
         self._mascara = re.compile(valor, re.UNICODE) if valor else None
 
-    def anexar_na_classe(self, cls, name):
+    def assign_class(self, cls, name):
         self.cls = cls
 
     def parse_block(self, linha):
@@ -169,7 +169,7 @@ class BaseField(object):
                 valor = self.to_python(valor)
                 if self.ao_atribuir:
                     valor = self.ao_atribuir(valor)
-                if valor is not None and self.lista \
+                if valor is not None and self.is_list \
                         and not isinstance(valor, list):
                     valor = [valor]
                 return valor
