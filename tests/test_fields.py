@@ -136,3 +136,12 @@ class TestDateTimeField(unittest.TestCase):
         valor = campo.parse_block(s)
         data_esperada = datetime(2013, 1, 2, 10, 21, 51)
         self.assertEqual(valor, data_esperada)
+
+if __name__ == '__main__':
+    import logging
+    logging.basicConfig(
+        # filename='test_parser.log',
+        level=logging.DEBUG,
+        format='%(asctime)-15s %(message)s'
+    )
+    unittest.main()

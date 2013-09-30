@@ -107,8 +107,8 @@ class TotalizadoresNaoFiscais(Parser):
     end = r'^[\s-]*$'
     Totalizador = CampoNF(is_list=True)
 
-    def process_item(self):
-        self.item = self.item.Totalizador
+    def process_item(self, item):
+        return item.Totalizador
 
 
 class ParserDeReducaoZ(Parser):
@@ -172,7 +172,7 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
     codificacao_arquivo = 'utf-8'
 
     def obter_arquivo(self):
-        return self.open_file('arquivos/cupom.txt')
+        return self.open_file('files/cupom.txt')
 
     def criar_analizador(self):
         return ExtratorDeDados()
@@ -293,7 +293,7 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
 
 class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
     def obter_arquivo(self):
-        return self.open_file('arquivos/cupom.txt')
+        return self.open_file('files/cupom.txt')
 
     def criar_analizador(self):
         class ExtratorDeDados(Parser):
@@ -312,7 +312,7 @@ class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
 
     def obter_arquivo(self):
         "sobrescrever retornando arquivo"
-        return self.open_file('arquivos/reducaoz.txt')
+        return self.open_file('files/reducaoz.txt')
 
     def criar_analizador(self):
         return ParserDeReducaoZ()

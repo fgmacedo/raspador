@@ -103,8 +103,7 @@ class ParserMixin(object):
                 if value is not None:
                     self.assign_value_into_item(name, value)
 
-        self.process_item()
-        res = self.item
+        res = self.process_item(self.item)
         self.item = None
         return res
 
@@ -116,9 +115,9 @@ class ParserMixin(object):
         else:
             self.item[name] = value
 
-    def process_item(self):
+    def process_item(self, item):
         "Allows final modifications at the object being returned"
-        pass
+        return item
 
 
 class ParserMetaclass(type):
