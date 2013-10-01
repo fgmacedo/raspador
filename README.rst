@@ -15,7 +15,7 @@ raspador
         :target: https://crate.io/packages/raspador/
 
 
-Biblioteca para extração de dados em documentos semi-estruturados.
+Library to extract data from semi-structured documents.
 
 A definição dos extratores é feita através de classes como modelos, de forma
 semelhante ao ORM do Django. Cada extrator procura por um padrão especificado
@@ -30,13 +30,6 @@ consumido antes do final da análise, caracterizando uma pipeline.
 A análise é foward-only, o que o torna extremamente rápido, e deste modo
 qualquer iterador que retorne uma string pode ser analisado, incluindo streams
 infinitos.
-
-
-Com uma base sólida e enxuta, é fácil construir seus próprios extratores.
-
-Além da utilidade da ferramenta, o raspador é um exemplo prático e simples da
-utilização de conceitos e recursos como iteradores, geradores, meta-programação
-e property-descriptors.
 
 
 Compatibility and dependencies
