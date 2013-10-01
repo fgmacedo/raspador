@@ -2,7 +2,7 @@
 raspador
 ========
 
-.. image:: https://api.travis-ci.org/fgmacedo/raspador.png
+.. image:: https://api.travis-ci.org/fgmacedo/raspador.png?branch=master
         :target: https://travis-ci.org/fgmacedo/raspador
 
 .. image:: https://coveralls.io/repos/fgmacedo/raspador/badge.png
@@ -20,7 +20,7 @@ Biblioteca para extração de dados em documentos semi-estruturados.
 A definição dos extratores é feita através de classes como modelos, de forma
 semelhante ao ORM do Django. Cada extrator procura por um padrão especificado
 por expressão regular, e a conversão para tipos primitidos é feita
-automaticamente a partir dos grupos capturados.
+automaticamente a partir dos groups capturados.
 
 
 O analisador é implementado como um gerador, onde cada item encontrado pode ser
@@ -39,66 +39,55 @@ utilização de conceitos e recursos como iteradores, geradores, meta-programaç
 e property-descriptors.
 
 
-Compatibilidade e dependências
-===============================
+Compatibility and dependencies
+==============================
 
-O raspador é compatível com Python 2.6, 2.7, 3.2, 3.3 e pypy.
+raspador runs on Python 2.6+, 3.2+ and pypy.
 
-Desenvolvimento realizado em Python 2.7.5 e Python 3.2.3.
-
-Não há dependências externas.
+There are no external dependencies.
 
 .. note:: Python 2.6
 
-    Em Python 2.6, a biblioteca `ordereddict
-    <https://pypi.python.org/pypi/ordereddict/>`_ é necessária.
+    With Python 2.6, you must install `ordereddict
+    <https://pypi.python.org/pypi/ordereddict/>`_.
 
-    Você pode instalar com pip::
+    You can install it with pip::
 
         pip install ordereddict
 
-Testes
+Tests
 ======
 
-Os testes dependem de algumas bibliotecas externas:
+To automate tests with all supported Python versions at once, we use `tox
+<http://tox.readthedocs.org/en/latest/>`_.
+
+Run all tests with:
+
+.. code-block:: bash
+
+    $ tox
+
+Tests depends on several third party libraries, but these are installed by tox
+on each Python's virtualenv:
 
 .. code-block:: text
 
-    coverage==3.6
     nose==1.3.0
+    coverage==3.6
     flake8==2.0
-    invoke==0.5.0
 
 
-Você pode executar os testes com ``nosetests``:
-
-.. code-block:: bash
-
-    $ nosetests
-
-E adicionalmente, verificar a compatibilidade com o PEP8:
-
-.. code-block:: bash
-
-    $ flake8 raspador testes
-
-Ou por conveniência, executar os dois em sequência com invoke:
-
-.. code-block:: bash
-
-    $ invoke test
-
-
-Exemplos
+Examples
 ========
 
-Extrator de dados em logs
--------------------------
+Extract data from logs
+----------------------
 
 .. code-block:: python
 
+    from __future__ import print_function
     import json
-    from raspador import Analizador, CampoString
+    from raspador import Parser, StringField
 
     out = """
     PART:/dev/sda1 UUID:423k34-3423lk423-sdfsd-43 TYPE:ext4
@@ -107,22 +96,23 @@ Extrator de dados em logs
     """
 
 
-    class AnalizadorDeLog(Analizador):
-        inicio = r'^PART.*'
-        fim = r'^PART.*'
-        PART = CampoString(r'PART:([^\s]+)')
-        UUID = CampoString(r'UUID:([^\s]+)')
-        TYPE = CampoString(r'TYPE:([^\s]+)')
+    class LogParser(Parser):
+        begin = r'^PART.*'
+        end = r'^PART.*'
+        PART = StringField(r'PART:([^\s]+)')
+        UUID = StringField(r'UUID:([^\s]+)')
+        TYPE = StringField(r'TYPE:([^\s]+)')
 
 
-    a = AnalizadorDeLog()
+    a = LogParser()
 
-    # res é um gerador
-    res = a.analizar(linha for linha in out.splitlines())
+    # res is a generator
+    res = a.parse(iter(out.splitlines()))
 
-    print (json.dumps(list(res), indent=2))
+    out_as_json = json.dumps(list(res), indent=2)
+    print (out_as_json)
 
-    # Saída:
+    # Output:
     """
     [
       {

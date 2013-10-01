@@ -1,23 +1,24 @@
 #coding: utf-8
+from collections import deque
 
 
 class Cache(object):
-    def __init__(self, tamanho=0):
-        self.tamanho = tamanho
-        self.lista = []
+    def __init__(self, max_length=0):
+        self.max_length = max_length
+        self.items = deque()
 
     def __len__(self):
-        return len(self.lista)
+        return len(self.items)
 
-    def adicionar(self, item):
-        self.lista.append(item)
-        if self.tamanho:
-            while len(self.lista) > self.tamanho:
-                self.lista.pop(0)
+    def append(self, item):
+        self.items.append(item)
+        if self.max_length:
+            while len(self.items) > self.max_length:
+                self.items.popleft()
 
     def itens(self):
-        return self.lista
+        return self.items
 
-    def consumir(self):
-        while self.lista:
-            yield self.lista.pop(0)
+    def consume(self):
+        while self.items:
+            yield self.items.popleft()

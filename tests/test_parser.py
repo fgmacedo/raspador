@@ -1,19 +1,74 @@
 #coding: utf-8
+from __future__ import unicode_literals
+import os
+import sys
 import unittest
+import codecs
 import re
-from .teste_uteis import full_path, assertDicionario
-from raspador.analizador import Analizador, Dicionario
-from raspador.campos import CampoBase, CampoNumerico, \
-    CampoInteiro, CampoBooleano
+
+sys.path.append('../')
+
+from raspador.parser import Parser, Dictionary
+from raspador.fields import BaseField, IntegerField, BooleanField
+from raspador.fields import BRFloatField as FloatField
 
 
-class CampoItem(CampoBase):
-    def _iniciar(self):
-        self.mascara = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
+full_path = lambda x: os.path.join(os.path.dirname(__file__), x)
+
+
+class DictDiffer(object):
+    """
+    Calculate the difference between two dictionaries as:
+    (1) items added
+    (2) items removed
+    (3) keys same in both but changed values
+    (4) keys same in both and unchanged values
+    """
+    def __init__(self, current_dict, past_dict):
+        self.current_dict, self.past_dict = current_dict, past_dict
+        self.current_keys, self.past_keys = [
+            set(d.keys()) for d in (current_dict, past_dict)
+        ]
+        self.intersect = self.current_keys.intersection(self.past_keys)
+
+    def added(self):
+        return self.current_keys - self.intersect
+
+    def removed(self):
+        return self.past_keys - self.intersect
+
+    def changed(self):
+        return set(o for o in self.intersect
+                   if self.past_dict[o] != self.current_dict[o])
+
+    def unchanged(self):
+        return set(o for o in self.intersect
+                   if self.past_dict[o] == self.current_dict[o])
+
+
+def assertDictionary(self, a, b, mensagem=''):
+    d = DictDiffer(a, b)
+
+    def diff(msg, fn):
+        q = getattr(d, fn)()
+        if mensagem:
+            msg = mensagem + '. ' + msg
+        m = 'chaves %s: %r, esperado:%r != encontrado:%r' % \
+            (msg, q, a, b,) if q else ''
+        self.assertFalse(q, m)
+
+    diff('adicionadas', 'added')
+    diff('removidas', 'removed')
+    diff('alteradas', 'changed')
+
+
+class CampoItem(BaseField):
+    def _setup(self):
+        self.search = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
                         "\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)")
 
-    def _para_python(self, r):
-        return Dicionario(
+    def to_python(self, r):
+        return Dictionary(
             Item=int(r[0]),
             Codigo=r[1],
             Descricao=r[2],
@@ -25,43 +80,43 @@ class CampoItem(CampoBase):
         )
 
 
-class ExtratorDeDados(Analizador):
-    inicio = r'^\s+CUPOM FISCAL\s+$'
-    fim = r'^FAB:.*BR$'
-    qtd_linhas_cache = 1
-    COO = CampoInteiro(r'COO:\s?(\d+)')
-    Cancelado = CampoBooleano(r'^\s+(CANCELAMENTO)\s+$')
-    Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
-    Itens = CampoItem(lista=True)
+class ExtratorDeDados(Parser):
+    begin = r'^\s+CUPOM FISCAL\s+$'
+    end = r'^FAB:.*BR$'
+    number_of_blocks_in_cache = 1
+    COO = IntegerField(r'COO:\s?(\d+)')
+    Cancelado = BooleanField(r'^\s+(CANCELAMENTO)\s+$')
+    Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
+    Itens = CampoItem(is_list=True)
 
 
-class TotalizadoresNaoFiscais(Analizador):
-    class CampoNF(CampoBase):
-        def _iniciar(self):
-            self.mascara = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
+class TotalizadoresNaoFiscais(Parser):
+    class CampoNF(BaseField):
+        def _setup(self):
+            self.search = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
 
-        def _para_python(self, v):
-            return Dicionario(
+        def to_python(self, v):
+            return Dictionary(
                 N=int(v[0]),
                 Operacao=v[1].strip(),
                 CON=int(v[2]),
                 ValorAcumulado=float(re.sub('[,.]', '.', v[3])),
             )
 
-    inicio = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
-    fim = r'^[\s-]*$'
-    Totalizador = CampoNF(lista=True)
+    begin = r'^\s+TOTALIZADORES NÃO FISCAIS\s+$'
+    end = r'^[\s-]*$'
+    Totalizador = CampoNF(is_list=True)
 
-    def processar_retorno(self):
-        self.retorno = self.retorno.Totalizador
+    def process_item(self, item):
+        return item.Totalizador
 
 
-class AnalizadorDeReducaoZ(Analizador):
-    inicio = r'^\s+REDUÇÃO Z\s+$'
-    fim = r'^FAB:.*BR$'
-    qtd_linhas_cache = 1
-    COO = CampoInteiro(r'COO:\s*(\d+)')
-    CRZ = CampoInteiro(r'Contador de Redução Z:\s*(\d+)')
+class ParserDeReducaoZ(Parser):
+    begin = r'^\s+REDUÇÃO Z\s+$'
+    end = r'^FAB:.*BR$'
+    number_of_blocks_in_cache = 1
+    COO = IntegerField(r'COO:\s*(\d+)')
+    CRZ = IntegerField(r'Contador de Redução Z:\s*(\d+)')
     Totalizadores = TotalizadoresNaoFiscais()
 
 
@@ -71,11 +126,11 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
     cache_itens = None
 
     def setUp(self):
-        self.analizador = self.criar_analizador()
+        self.parser = self.criar_analizador()
         self.arquivo = self.obter_arquivo()
 
-        # verificando se analizador foi criado
-        self.assertTrue(hasattr(self.analizador, 'analizar'))
+        # verificando se parser foi criado
+        self.assertTrue(hasattr(self.parser, 'parse'))
 
         if self.cache_itens:
             self.itens = self.cache_itens
@@ -103,18 +158,21 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
         raise NotImplementedError('Return an file-like object')
 
     def analizar(self):
-        return list(self.analizador.analizar(
-            self.arquivo,
-            codificacao=self.codificacao_arquivo) or [])
+        return list(self.parser.parse(self.arquivo) or [])
 
-    assertDicionario = assertDicionario
+    @classmethod
+    def open_file(cls, filename):
+        return codecs.open(full_path(filename),
+                           encoding=cls.codificacao_arquivo)
+
+    assertDictionary = assertDictionary
 
 
 class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
     codificacao_arquivo = 'utf-8'
 
     def obter_arquivo(self):
-        return open(full_path('arquivos/cupom.txt'))
+        return self.open_file('files/cupom.txt')
 
     def criar_analizador(self):
         return ExtratorDeDados()
@@ -235,13 +293,13 @@ class TesteDeExtrairDadosDeCupom(BaseParaTestesComApiDeArquivo):
 
 class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
     def obter_arquivo(self):
-        return open(full_path('arquivos/cupom.txt'))
+        return self.open_file('files/cupom.txt')
 
     def criar_analizador(self):
-        class ExtratorDeDados(Analizador):
-            inicio = r'^\s+CUPOM FISCAL\s+$'
-            fim = r'^FAB:.*BR$'
-            Total = CampoNumerico(r'^TOTAL R\$\s+(\d+,\d+)')
+        class ExtratorDeDados(Parser):
+            begin = r'^\s+CUPOM FISCAL\s+$'
+            end = r'^FAB:.*BR$'
+            Total = FloatField(r'^TOTAL R\$\s+(\d+,\d+)')
 
         return ExtratorDeDados()
 
@@ -249,15 +307,15 @@ class TesteExtrairDadosDeCupomCancelado(BaseParaTestesComApiDeArquivo):
         self.assertEqual(len(self.itens), 1)
 
 
-class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
+class TesteExtrairDadosComParseresAlinhados(BaseParaTestesComApiDeArquivo):
     codificacao_arquivo = 'utf-8'
 
     def obter_arquivo(self):
         "sobrescrever retornando arquivo"
-        return open(full_path('arquivos/reducaoz.txt'))
+        return self.open_file('files/reducaoz.txt')
 
     def criar_analizador(self):
-        return AnalizadorDeReducaoZ()
+        return ParserDeReducaoZ()
 
     def teste_deve_retornar_dados(self):
         reducao = [
@@ -284,4 +342,13 @@ class TesteExtrairDadosComAnalizadoresAlinhados(BaseParaTestesComApiDeArquivo):
                 ]
             }
         ]
-        self.assertDicionario(reducao[0], self.itens[0])
+        self.assertDictionary(reducao[0], self.itens[0])
+
+if __name__ == '__main__':
+    import logging
+    logging.basicConfig(
+        # filename='test_parser.log',
+        level=logging.DEBUG,
+        format='%(asctime)-15s %(message)s'
+    )
+    unittest.main()

@@ -1,9 +1,10 @@
 # flake8: noqa
 
-from .analizador import Analizador, Dicionario
-from .campos import CampoBase, CampoString, CampoNumerico, \
-    CampoInteiro, CampoData, CampoDataHora, CampoBooleano
+from .parser import Parser
+from .item import Dictionary
+from .fields import BaseField, StringField, FloatField, BRFloatField, \
+    IntegerField, DateField, DateTimeField, BooleanField
 
-from .decoradores import ProxyDeCampo, ProxyConcatenaAteRE
+from .decorators import FieldProxy, UnionUntilRegexProxy
 
 from .cache import Cache
