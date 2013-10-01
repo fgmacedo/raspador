@@ -1,12 +1,14 @@
 #coding: utf-8
 
 """
-Os fields são simples extratores de dados baseados em expressões regulares.
 
-Ao confrontar uma block recebida para análise com sua expressão regular, o
-campo verifica se há groups de dados capturados, e então pode realizar algum
-processamento e validações nestes dados. Se o campo considerar os dados
-válidos, retorna o(s) dado(s). """
+Fields define how and what data will be extracted. The parser does not expect
+the fields explicitly inherit from :py:class:`~raspador.fields.BaseField`, the
+minimum expected is that a field has at least a method `parse_block`.
+
+The fields in this file are based on regular expressions and provide conversion
+for primitive types in Python.
+"""
 
 import re
 from datetime import datetime
@@ -15,61 +17,58 @@ import collections
 
 class BaseField(object):
     """
-    Contém lógica de processamento para extrair dados através de expressões
-    regulares, além de prover métodos utilitários que podem ser sobrescritos
-    para customizações no tratamento dos dados.
+    Contains processing logic to extract data using regular expressions, and
+    provide utility methods that can be overridden for custom data processing.
 
-    O comportamento do Campo pode ser ajustado através de diversos parâmetros:
+
+    Default behavior can be adjusted by parameters:
 
     search
 
-        O requisito mínimo para um campo é uma máscara em expressão regular,
-        onde deve-se especificar um grupo para captura::
+        Regular expression that must specify a group of capture. Use
+        parentheses for capturing::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = BaseField(search=r'COO:(\d+)')
-            >>> campo.parse_block(s)
+            >>> field = BaseField(search=r'COO:(\d+)')
+            >>> field.parse_block(s)
             '022734'
 
-        O parâmetro search é o único posicional, e deste modo, seu nome pode
-        ser omitido::
+        The `search` parameter is the only by position and hence its name can
+        be omitted::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = BaseField(r'COO:(\d+)')
-            >>> campo.parse_block(s)
+            >>> field = BaseField(r'COO:(\d+)')
+            >>> field.parse_block(s)
             '022734'
 
 
-    out_processor
+    input_processor
 
-        Recebe um callback para tratar o value antes de ser retornado pelo
-        campo.
+        Receives a function to handle the captured value before being returned
+        by the field.
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> def dobro(value):
+            >>> def double(value):
             ...     return int(value) * 2
             ...
-            >>> campo = BaseField(r'COO:(\d+)', out_processor=dobro)
-            >>> campo.parse_block(s)  # 45468 = 2 x 22734
+            >>> field = BaseField(r'COO:(\d+)', input_processor=double)
+            >>> field.parse_block(s)  # 45468 = 2 x 22734
             45468
 
     groups
 
-        Permite escolher quais groups capturados o campo deve processar como
-        dados de entrada, utilizado para expressões regulares que utilizam
-        groups para correspondência da expressão regular, mas que apenas parte
-        destes groups possui informação útil.
+        Specify which numbered capturing groups do you want do process in.
 
-        Pode-se informar um número inteiro, que será o índice do grupo,
-        inicando em 0::
+
+        You can enter a integer number, as the group index::
 
             >>> s = "Contador de Reduções Z:                     1246"
-            >>> campo = BaseField(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
-                groups=1, out_processor=int)
-            >>> campo.parse_block(s)
+            >>> field = BaseField(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
+                groups=1, input_processor=int)
+            >>> field.parse_block(s)
             1246
 
-        Ou uma lista de inteiros::
+        Or a list of integers::
 
             >>> s = "Data do movimento: 02/01/2013 10:21:51"
             >>> c = BaseField(r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)',\
@@ -77,38 +76,47 @@ class BaseField(object):
             >>> c.parse_block(s)
             ['02', '01', '2013']
 
+        .. note::
+
+            If you do not need the group to capture its match, you can optimize
+            the regular expression putting an `?:` after the opening
+            parenthesis::
+
+            >>> s = "Contador de Reduções Z:                     1246"
+            >>> field = BaseField(r'Contador de Reduç(?:ão|ões) Z:\s*(\d+)')
+            >>> field.parse_block(s)
+            '1246'
 
     default
 
-        Valor que será utilizado no :py:class:`~raspador.parser.Parser`
-        , quando o campo não retornar value após a análise das
-        linhas recebidas.
-
+        If assigned, the :py:class:`~raspador.parser.Parser` will query this
+        default if no value was returned by the field.
 
     is_list
 
-        Quando especificado, retorna o value como uma lista::
+        When specified, returns the value as a list::
 
             >>> s = "02/01/2013 10:21:51           COO:022734"
-            >>> campo = BaseField(r'COO:(\d+)', is_list=True)
-            >>> campo.parse_block(s)
+            >>> field = BaseField(r'COO:(\d+)', is_list=True)
+            >>> field.parse_block(s)
             ['022734']
 
-        Por convenção, quando um campo retorna uma lista, o
-        :py:class:`~raspador.parser.Parser` acumula os valores
-        retornados pelo campo.
+        By convention, when a field returns a list, the
+        :py:class:`~raspador.parser.Parser` accumulates values
+         returned by the field.
+
     """
     def __init__(self, search=None, default=None, is_list=False,
-                 out_processor=None, groups=[]):
+                 input_processor=None, groups=[]):
         self.search = search
         self.default = default
         self.is_list = is_list
-        self.out_processor = out_processor
+        self.input_processor = input_processor
         self.groups = groups
 
-        if self.out_processor and \
-                not isinstance(self.out_processor, collections.Callable):
-            raise TypeError('out_processor is not callable.')
+        if self.input_processor and \
+                not isinstance(self.input_processor, collections.Callable):
+            raise TypeError('input_processor is not callable.')
 
         if not hasattr(self.groups, '__iter__'):
             self.groups = (self.groups,)
@@ -167,8 +175,8 @@ class BaseField(object):
             if self._is_valid_result(value):
                 value = self._process_value(value)
                 value = self.to_python(value)
-                if self.out_processor:
-                    value = self.out_processor(value)
+                if self.input_processor:
+                    value = self.input_processor(value)
                 if value is not None and self.is_list \
                         and not isinstance(value, list):
                     value = [value]
@@ -202,8 +210,8 @@ class IntegerField(BaseField):
 
 class BooleanField(BaseField):
     """
-    Retorna verdadeiro se a Regex bater com uma block completa, e
-    se ao menos algum value for capturado.
+    Returns true if the block is matched by Regex, and is at least some value
+    is captured.
     """
     def _setup(self):
         self.default = False
@@ -225,11 +233,11 @@ class BooleanField(BaseField):
 
 class DateField(BaseField):
     """
-    Campo que mantém dados no formato de data,
-    representado em Python por datetine.date.
 
-    Formato:
-        Veja http://docs.python.org/library/datetime.html para detalhes.
+    Field that holds data in date format, represented in Python by
+    datetine.date.
+
+        http://docs.python.org/library/datetime.html
     """
 
     default_format_string = '%d/%m/%Y'
@@ -246,11 +254,10 @@ class DateField(BaseField):
 
 class DateTimeField(DateField):
     """
-    Campo que mantém dados no formato de data/hora,
-    representado em Python por datetine.datetime.
+    Field that holds data in hour/date format, represented in Python by
+    datetine.datetime.
 
-    Formato:
-        Veja http://docs.python.org/library/datetime.html para detalhes.
+        http://docs.python.org/library/datetime.html
     """
 
     default_format_string = '%d/%m/%Y %H:%M:%S'

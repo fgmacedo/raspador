@@ -8,11 +8,11 @@ class CampoFake(object):
     def __init__(self, default=None, is_list=False, retornar=False):
         self.default = default
         self.is_list = is_list
-        self.linhas = []
+        self.lines = []
         self.retornar = retornar
 
     def parse_block(self, linha):
-        self.linhas.append(linha)
+        self.lines.append(linha)
         if self.retornar:
             return linha
 
@@ -45,7 +45,7 @@ class TesteDeProxyChamandoMetodosSemIntervencao(unittest.TestCase):
         p.parse_block('teste1')
         p.parse_block('teste2')
         self.assertEqual(
-            mock.linhas,
+            mock.lines,
             ['teste1', 'teste2']
         )
 
@@ -66,7 +66,7 @@ class TesteDeDecoradorConcatenaAteRE(unittest.TestCase):
                 'l1 l2 l3 l4',
                 'l5 l6',
             ],
-            mock.linhas
+            mock.lines
         )
 
     def teste_deve_chamar_decorado_retornando_primeiro_valor(self):
@@ -87,7 +87,7 @@ class TesteDeDecoradorConcatenaAteRE(unittest.TestCase):
                 'l5',
                 'l6',
             ],
-            mock.linhas
+            mock.lines
         )
 
 

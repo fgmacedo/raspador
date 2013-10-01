@@ -27,20 +27,20 @@ class TestBaseField(unittest.TestCase):
         def dobro(valor):
             return int(valor) * 2
 
-        campo = BaseField(r'COO:(\d+)', out_processor=dobro)
+        campo = BaseField(r'COO:(\d+)', input_processor=dobro)
         valor = campo.parse_block(s)
         self.assertEqual(valor, 45468)  # 45468 = 2 x 22734
 
     def test_should_recusar_callback_invalido(self):
         self.assertRaises(
             TypeError,
-            lambda: BaseField(r'COO:(\d+)', out_processor='pegadinha')
+            lambda: BaseField(r'COO:(\d+)', input_processor='pegadinha')
         )
 
     def test_should_utilizar_grupo_quando_informado(self):
         s = "Contador de Reduções Z:                     1246"
         campo = BaseField(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', groups=1,
-                          out_processor=int)
+                          input_processor=int)
         valor = campo.parse_block(s)
         self.assertEqual(valor, 1246)
 
