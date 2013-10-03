@@ -5,6 +5,7 @@ MANIFEST
 
 # Virtualenvs
 env*
+.tox
 
 # Distribute
 build

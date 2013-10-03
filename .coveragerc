@@ -1,6 +1,6 @@
 [run]
 include=*raspador*
-omit=tasks.py
+omit=tasks.py,*ordereddict*
 
 [report]
 exclude_lines =
@@ -8,3 +8,5 @@ exclude_lines =
     raise NotImplementedError
 
     if __name__ == '__main__':
+
+    except ImportError:
