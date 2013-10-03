@@ -15,21 +15,21 @@ raspador
         :target: https://crate.io/packages/raspador/
 
 
-Library to extract data from semi-structured documents.
+Library to extract data from semi-structured text documents.
 
-A definição dos extratores é feita através de classes como modelos, de forma
-semelhante ao ORM do Django. Cada extrator procura por um padrão especificado
-por expressão regular, e a conversão para tipos primitidos é feita
-automaticamente a partir dos groups capturados.
+It's best suited for data-processing in files that do not have a formal
+structure and are in plain text (or that are easy to convert). Structured files
+like XML, CSV and HTML have excellent alternatives.
 
+The extractors are defined through classes as models, something similar to the
+Django ORM. Each field search for a pattern specified by the regular
+expression, and captured groups are converted automatically to primitives.
 
-O analisador é implementado como um gerador, onde cada item encontrado pode ser
-consumido antes do final da análise, caracterizando uma pipeline.
+The parser is implemented as a generator, where each item found can be consumed
+before the end of the analysis, featuring a pipeline.
 
-
-A análise é foward-only, o que o torna extremamente rápido, e deste modo
-qualquer iterador que retorne uma string pode ser analisado, incluindo streams
-infinitos.
+The analysis is foward-only, which makes it extremely quickly, and thus any
+iterator that returns a string can be analyzed, including infinite streams.
 
 
 Compatibility and dependencies
