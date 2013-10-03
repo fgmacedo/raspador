@@ -12,6 +12,7 @@ Raspador |version| documentation
    intro/overview
    intro/install
    intro/tutorial
+   raspador
 
 
 Looking for specific information? Try the :ref:`genindex` or :ref:`modindex`.

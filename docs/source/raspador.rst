@@ -3,8 +3,10 @@
 raspador
 ========
 
-O módulo raspador fornece estrutura genérica para extração de dados a partir de
-arquivos texto semi-estruturados.
+Library to extract data from semi-structured text documents.
+
+It's best suited for data-processing in files that do not have a formal
+structure and are in plain text (or that are easy to convert).
 
 
 Parser
@@ -14,7 +16,7 @@ Parser
     :members:
 
 
-Campos
+Fields
 ------
 
 .. automodule:: raspador.fields
