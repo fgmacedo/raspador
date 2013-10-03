@@ -15,34 +15,54 @@ raspador
         :target: https://crate.io/packages/raspador/
 
 
-Biblioteca para extração de dados em documentos semi-estruturados.
+Library to extract data from semi-structured text documents.
 
-A definição dos extratores é feita através de classes como modelos, de forma
-semelhante ao ORM do Django. Cada extrator procura por um padrão especificado
-por expressão regular, e a conversão para tipos primitidos é feita
-automaticamente a partir dos groups capturados.
+It's best suited for data-processing in files that do not have a formal
+structure and are in plain text (or that are easy to convert). Structured files
+like XML, CSV and HTML doesn't fit a good use case for raspador, and have
+excellent alternatives to get data extracted, like lxml_, html5lib_,
+BeautifulSoup_, and PyQuery_.
+
+The extractors are defined through classes as models, something similar to the
+Django ORM. Each field searches for a pattern specified by the regular
+expression, and captured groups are converted automatically to primitives.
+
+The parser is implemented as a generator, where each item found can be consumed
+before the end of the analysis, featuring a pipeline.
+
+The analysis is forward-only, which makes it extremely quick, and thus any
+iterator that returns a string can be analyzed, including infinite streams.
+
+.. _lxml: http://lxml.de
+.. _html5lib: https://github.com/html5lib/html5lib-python
+.. _BeautifulSoup: http://www.crummy.com/software/BeautifulSoup/
+.. _PyQuery: https://github.com/gawel/pyquery/
 
 
-O analisador é implementado como um gerador, onde cada item encontrado pode ser
-consumido antes do final da análise, caracterizando uma pipeline.
+Install
+=======
+
+raspador works on CPython 2.6+, CPython 3.2+ and PyPy. To install it, use::
+
+    pip install raspador
+
+or easy install::
+
+    easy_install raspador
 
 
-A análise é foward-only, o que o torna extremamente rápido, e deste modo
-qualquer iterador que retorne uma string pode ser analisado, incluindo streams
-infinitos.
+From source
+-----------
+
+Download and install from source::
+
+    git clone https://github.com/fgmacedo/raspador.git
+    cd raspador
+    python setup.py install
 
 
-Com uma base sólida e enxuta, é fácil construir seus próprios extratores.
-
-Além da utilidade da ferramenta, o raspador é um exemplo prático e simples da
-utilização de conceitos e recursos como iteradores, geradores, meta-programação
-e property-descriptors.
-
-
-Compatibility and dependencies
-==============================
-
-raspador runs on Python 2.6+, 3.2+ and pypy.
+Dependencies
+------------
 
 There are no external dependencies.
 
@@ -67,7 +87,7 @@ Run all tests with:
 
     $ tox
 
-Tests depends on several third party libraries, but these are installed by tox
+Tests depend on several third party libraries, but these are installed by tox
 on each Python's virtualenv:
 
 .. code-block:: text

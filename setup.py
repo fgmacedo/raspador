@@ -10,7 +10,7 @@ setup(
     name='raspador',
     author='Fernando Macedo',
     author_email='fgmacedo@gmail.com',
-    description='Library to extract data from semi-structured documents',
+    description='Library to extract data from semi-structured text documents',
     long_description=long_description,
     license='MIT',
     url="http://github.org/fgmacedo/raspador",
