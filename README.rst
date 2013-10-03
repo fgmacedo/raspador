@@ -20,8 +20,8 @@ Library to extract data from semi-structured text documents.
 It's best suited for data-processing in files that do not have a formal
 structure and are in plain text (or that are easy to convert). Structured files
 like XML, CSV and HTML doesn't fit a good use case for raspador, and have
-excellent alternatives to get data extracted, like lxml, html5lib,
-BeautifulSoup, and PyQuery.
+excellent alternatives to get data extracted, like lxml_, html5lib_,
+BeautifulSoup_, and PyQuery_.
 
 The extractors are defined through classes as models, something similar to the
 Django ORM. Each field searches for a pattern specified by the regular
@@ -33,20 +33,20 @@ before the end of the analysis, featuring a pipeline.
 The analysis is forward-only, which makes it extremely quick, and thus any
 iterator that returns a string can be analyzed, including infinite streams.
 
+.. _lxml: http://lxml.de
+.. _html5lib: https://github.com/html5lib/html5lib-python
+.. _BeautifulSoup: http://www.crummy.com/software/BeautifulSoup/
+.. _PyQuery: https://github.com/gawel/pyquery/
+
 
 Install
 =======
 
-Package managers
-----------------
-
-You can install using pip or easy_install.
-
-PIP::
+raspador works on CPython 2.6+, CPython 3.2+ and PyPy. To install it, use::
 
     pip install raspador
 
-Easy install::
+or easy install::
 
     easy_install raspador
 
@@ -61,10 +61,8 @@ Download and install from source::
     python setup.py install
 
 
-Compatibility and dependencies
-==============================
-
-raspador runs on Python 2.6+, 3.2+ and pypy.
+Dependencies
+------------
 
 There are no external dependencies.
 
