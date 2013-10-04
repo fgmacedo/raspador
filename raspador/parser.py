@@ -98,7 +98,7 @@ class ParserMixin(object):
                 if hasattr(field, 'finalize') and \
                         isinstance(field.finalize, collections.Callable):
                     value = field.finalize()
-                if value is None:
+                if value is None and hasattr(field, 'default'):
                     value = field.default
                 if value is not None:
                     self.assign_value_into_item(name, value)

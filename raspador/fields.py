@@ -243,12 +243,13 @@ class DateField(BaseField):
     default_format_string = '%d/%m/%Y'
     convertion_function = lambda self, date: datetime.date(date)
 
-    def __init__(self, search=None, formato=None, **kwargs):
-        self.formato = formato if formato else self.default_format_string
+    def __init__(self, search=None, format_string=None, **kwargs):
+        self.format_string = format_string \
+            if format_string else self.default_format_string
         super(DateField, self).__init__(search=search, **kwargs)
 
     def to_python(self, value):
-        date_value = datetime.strptime(value, self.formato)
+        date_value = datetime.strptime(value, self.format_string)
         return self.convertion_function(date_value)
 
 
