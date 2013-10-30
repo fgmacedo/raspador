@@ -9,6 +9,7 @@ from .cache import Cache
 from .item import Dictionary
 
 logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class ParserMixin(object):
@@ -57,14 +58,16 @@ class ParserMixin(object):
                 yield res
 
     def parse_block(self, block):
-        logger.debug('parse_block: %r:%s', type(block), block)
+        logger.debug('%s.block: %r:%s', self.__class__.__name__, type(block),
+                     block)
         self.cache.append(block)
 
         if self.has_search_begin and not self.begin_found:
             self.begin_found = bool(self._begin.match(block))
 
         if self.begin_found:
-            logger.debug('init found: %r', self.begin_found)
+            logger.debug('%s.begin_found: %r', self.__class__.__name__,
+                         self.begin_found)
             if not self.has_item:
                 self.item = self.default_item_class()
             if self.has_search_end:
@@ -108,6 +111,7 @@ class ParserMixin(object):
         return res
 
     def assign_value_into_item(self, name, value):
+        logger.debug('%s.%s = %r', self.__class__.__name__, name, value)
         if isinstance(value, list) and not name in self.item:
             self.item[name] = value
         elif isinstance(value, list) and hasattr(self.item[name], 'extend'):
