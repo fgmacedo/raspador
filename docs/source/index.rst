@@ -7,12 +7,10 @@ Raspador |version| documentation
 
 
 .. toctree::
-    :hidden:
 
-   intro/overview
-   intro/install
-   intro/tutorial
-   raspador
+    intro/install
+    raspador
+    community/updates
 
 
 Looking for specific information? Try the :ref:`genindex` or :ref:`modindex`.
