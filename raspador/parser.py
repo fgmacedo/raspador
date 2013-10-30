@@ -9,7 +9,8 @@ from .cache import Cache
 from .item import Dictionary
 
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+if hasattr(logging, 'NullHandler'):
+    logger.addHandler(logging.NullHandler())
 
 
 class ParserMixin(object):
