@@ -19,7 +19,7 @@ Library to extract data from semi-structured text documents.
 
 It's best suited for data-processing in files that do not have a formal
 structure and are in plain text (or that are easy to convert). Structured files
-like XML, CSV and HTML doesn't fit a good use case for raspador, and have
+like XML, CSV and HTML doesn't fit a good use case for Raspador, and have
 excellent alternatives to get data extracted, like lxml_, html5lib_,
 BeautifulSoup_, and PyQuery_.
 
@@ -42,7 +42,7 @@ iterator that returns a string can be analyzed, including infinite streams.
 Install
 =======
 
-raspador works on CPython 2.6+, CPython 3.2+ and PyPy. To install it, use::
+Raspador works on CPython 2.6+, CPython 3.2+ and PyPy. To install it, use::
 
     pip install raspador
 

@@ -63,7 +63,7 @@ def assertDictionary(self, a, b, mensagem=''):
 
 
 class CampoItem(BaseField):
-    def _setup(self):
+    def setup(self):
         self.search = (r"(\d+)\s(\d+)\s+([\w.#\s/()]+)\s+(\d+)(\w+)"
                         "\s+X\s+(\d+,\d+)\s+(\w+)\s+(\d+,\d+)")
 
@@ -92,7 +92,7 @@ class ExtratorDeDados(Parser):
 
 class TotalizadoresNaoFiscais(Parser):
     class CampoNF(BaseField):
-        def _setup(self):
+        def setup(self):
             self.search = r'(\d+)\s+([\w\s]+)\s+(\d+)\s+(\d+,\d+)'
 
         def to_python(self, v):
