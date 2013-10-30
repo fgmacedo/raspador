@@ -154,7 +154,6 @@ class ParserMetaclass(type):
         setattr(cls, 'has_search_'+name, has_attr)
         if has_attr:
             regex = attrs[name]
-            logger.error('add_regex_attr %s: %s', name, regex)
             setattr(cls, '_' + name, re.compile(regex, re.UNICODE))
 
 
