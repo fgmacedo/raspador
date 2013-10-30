@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import unittest
-import codecs
+import io
 import re
 
 sys.path.append('../')
@@ -162,8 +162,7 @@ class BaseParaTestesComApiDeArquivo(unittest.TestCase):
 
     @classmethod
     def open_file(cls, filename):
-        return codecs.open(full_path(filename),
-                           encoding=cls.codificacao_arquivo)
+        return io.open(full_path(filename), encoding=cls.codificacao_arquivo)
 
     assertDictionary = assertDictionary
 
