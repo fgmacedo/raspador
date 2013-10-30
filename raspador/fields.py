@@ -63,16 +63,16 @@ class BaseField(object):
         You can enter a integer number, as the group index::
 
             >>> s = "Contador de Reduções Z:                     1246"
-            >>> field = BaseField(r'Contador de Reduç(ão|ões) Z:\s*(\d+)', \
-                groups=1, input_processor=int)
+            >>> regex = r'Contador de Reduç(ão|ões) Z:\s*(\d+)'
+            >>> field = BaseField(regex, groups=1, input_processor=int)
             >>> field.parse_block(s)
             1246
 
         Or a list of integers::
 
             >>> s = "Data do movimento: 02/01/2013 10:21:51"
-            >>> c = BaseField(r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)',\
-                groups=[1, 2, 3])
+            >>> regex = r'^Data .*(movimento|cupom): (\d+)/(\d+)/(\d+)'
+            >>> c = BaseField(regex, groups=[1, 2, 3])
             >>> c.parse_block(s)
             ['02', '01', '2013']
 
@@ -121,13 +121,13 @@ class BaseField(object):
         if not hasattr(self.groups, '__iter__'):
             self.groups = (self.groups,)
 
-        self._setup()
+        self.setup()
 
     @property
     def _search_method(self):
         return self.search.findall
 
-    def _setup(self):
+    def setup(self):
         "Hook to special setup required on child classes"
         pass
 
@@ -189,18 +189,37 @@ class StringField(BaseField):
 
 
 class FloatField(BaseField):
-    "Removes thousand separator and converts to float."
+    """
+    Sanitizes captured value according to thousand and decimal separators and
+    converts to float.
+    """
+    default_thousand_separator = ','
+    default_decimal_separator = '.'
+
+    def __init__(self, search, thousand_separator=None, decimal_separator=None,
+                 **kwargs):
+        super(FloatField, self).__init__(search, **kwargs)
+        self.thousand_separator = thousand_separator if thousand_separator \
+            else self.default_thousand_separator
+        self.decimal_separator = decimal_separator if decimal_separator \
+            else self.default_decimal_separator
+
     def to_python(self, value):
-        value = value.replace(',', '')
+        value = value.replace(self.thousand_separator, '')
+        value = value.replace(self.decimal_separator, '.')
         return float(value)
 
 
-class BRFloatField(BaseField):
-    "Removes thousand separator and converts to float (Brazilian format)"
-    def to_python(self, value):
-        value = value.replace('.', '')
-        value = value.replace(',', '.')
-        return float(value)
+class BRFloatField(FloatField):
+    """
+    Removes thousand separator and converts to float (Brazilian format).
+
+    .. deprecated:: 0.2.2
+
+        Use :py:class:`~raspador.fields.FloatField` instead.
+    """
+    default_thousand_separator = '.'
+    default_decimal_separator = ','
 
 
 class IntegerField(BaseField):
@@ -213,7 +232,7 @@ class BooleanField(BaseField):
     Returns true if the block is matched by Regex, and is at least some value
     is captured.
     """
-    def _setup(self):
+    def setup(self):
         self.default = False
 
     @property
