@@ -92,9 +92,9 @@ on each Python's virtualenv:
 
 .. code-block:: text
 
-    nose==1.3.0
-    coverage==3.6
-    flake8==2.0
+    nose==1.3.1
+    coverage==3.7.1
+    flake8==2.1.0
 
 
 Examples
