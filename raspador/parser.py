@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 # from __future__ import unicode_literals
 import re
 import weakref
@@ -97,7 +97,7 @@ class ParserMixin(object):
 
     def finalize_item(self):
         for name, field in list(self.fields.items()):
-            if not name in self.item:
+            if name not in self.item:
                 value = None
                 if hasattr(field, 'finalize') and \
                         isinstance(field.finalize, collections.Callable):
@@ -113,7 +113,7 @@ class ParserMixin(object):
 
     def assign_value_into_item(self, name, value):
         logger.debug('%s.%s = %r', self.__class__.__name__, name, value)
-        if isinstance(value, list) and not name in self.item:
+        if isinstance(value, list) and name not in self.item:
             self.item[name] = value
         elif isinstance(value, list) and hasattr(self.item[name], 'extend'):
             self.item[name].extend(value)

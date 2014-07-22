@@ -3,6 +3,10 @@
 Release history
 ===============
 
+0.2.3
+
+- Linux line endings (thanks Jayson Reis - jaysonsantos)
+
 0.2.2 (2013-10-30)
 ------------------
 
