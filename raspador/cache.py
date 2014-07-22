@@ -5,20 +5,21 @@ from collections import deque
 class Cache(object):
     def __init__(self, max_length=0):
         self.max_length = max_length
-        self.items = deque()
+        self._items = deque()
 
     def __len__(self):
-        return len(self.items)
+        return len(self._items)
 
     def append(self, item):
-        self.items.append(item)
+        self._items.append(item)
         if self.max_length:
-            while len(self.items) > self.max_length:
-                self.items.popleft()
+            while len(self._items) > self.max_length:
+                self._items.popleft()
 
-    def itens(self):
-        return self.items
+    @property
+    def items(self):
+        return self._items
 
     def consume(self):
-        while self.items:
-            yield self.items.popleft()
+        while self._items:
+            yield self._items.popleft()
