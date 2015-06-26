@@ -8,11 +8,11 @@ raspador
 .. image:: https://coveralls.io/repos/fgmacedo/raspador/badge.png
         :target: https://coveralls.io/r/fgmacedo/raspador
 
-.. image:: https://pypip.in/v/raspador/badge.png
+.. image:: https://img.shields.io/pypi/v/raspador.svg
         :target: https://pypi.python.org/pypi/raspador
 
-.. image:: https://pypip.in/d/raspador/badge.png
-        :target: https://crate.io/packages/raspador/
+.. image:: https://img.shields.io/pypi/dm/raspador.svg
+        :target: https://pypi.python.org/pypi/raspador
 
 
 Library to extract data from semi-structured text documents.
