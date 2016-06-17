@@ -2,7 +2,7 @@
 raspador
 ========
 
-.. image:: https://api.travis-ci.org/fgmacedo/raspador.png?branch=master
+.. image:: https://api.travis-ci.org/fgmacedo/raspador.svg?branch=master
         :target: https://travis-ci.org/fgmacedo/raspador
 
 .. image:: https://coveralls.io/repos/fgmacedo/raspador/badge.png
