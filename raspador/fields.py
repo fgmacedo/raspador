@@ -260,7 +260,9 @@ class DateField(BaseField):
     """
 
     default_format_string = '%d/%m/%Y'
-    convertion_function = lambda self, date: datetime.date(date)
+
+    def convertion_function(self, date):
+        return datetime.date(date)
 
     def __init__(self, search=None, format_string=None, **kwargs):
         self.format_string = format_string \
@@ -281,7 +283,9 @@ class DateTimeField(DateField):
     """
 
     default_format_string = '%d/%m/%Y %H:%M:%S'
-    convertion_function = lambda self, date: date
+
+    def convertion_function(self, date):
+        return date
 
 
 if __name__ == '__main__':

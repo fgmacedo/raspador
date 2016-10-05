@@ -42,7 +42,7 @@ iterator that returns a string can be analyzed, including infinite streams.
 Install
 =======
 
-Raspador works on CPython 2.6+, CPython 3.2+ and PyPy. To install it, use::
+Raspador works on CPython 2.7+, CPython 3.4+ and PyPy. To install it, use::
 
     pip install raspador
 
@@ -65,15 +65,6 @@ Dependencies
 ------------
 
 There are no external dependencies.
-
-.. note:: Python 2.6
-
-    With Python 2.6, you must install `ordereddict
-    <https://pypi.python.org/pypi/ordereddict/>`_.
-
-    You can install it with pip::
-
-        pip install ordereddict
 
 Tests
 ======
