@@ -143,3 +143,8 @@ Extract data from logs
       }
     ]
     """
+
+
+.. image:: https://badges.gitter.im/fgmacedo/raspador.svg
+   :alt: Join the chat at https://gitter.im/fgmacedo/raspador
+   :target: https://gitter.im/fgmacedo/raspador?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
